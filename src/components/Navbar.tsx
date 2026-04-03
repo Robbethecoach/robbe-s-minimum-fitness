@@ -6,15 +6,15 @@ const Navbar = () => {
   const location = useLocation();
 
   const linkClass = (path: string) =>
-    `text-xs tracking-[0.1em] uppercase transition-opacity hover:opacity-100 ${
-      location.pathname === path ? 'opacity-100' : 'opacity-60'
+    `text-[13px] font-light tracking-[0.1em] uppercase transition-opacity hover:opacity-100 ${
+      location.pathname === path ? 'opacity-100' : 'opacity-50'
     }`;
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/80 backdrop-blur-sm">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0c0c0b] border-b border-[rgba(242,237,228,0.08)]">
       <div className="container mx-auto flex h-14 items-center justify-between px-6">
-        <Link to="/" className="text-sm font-medium tracking-[0.08em] uppercase">
-          Robbethecoach
+        <Link to="/" className="font-serif italic text-[20px] font-normal">
+          robbethecoach
         </Link>
         <div className="flex items-center gap-8">
           {user && (
@@ -30,7 +30,7 @@ const Navbar = () => {
           {user ? (
             <button
               onClick={signOut}
-              className="text-xs tracking-[0.1em] uppercase opacity-60 transition-opacity hover:opacity-100"
+              className="text-[13px] font-light tracking-[0.1em] uppercase opacity-50 transition-opacity hover:opacity-100"
             >
               Sign out
             </button>
