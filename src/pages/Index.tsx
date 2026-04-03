@@ -50,17 +50,22 @@ const Index = () => {
       {/* Pillars */}
       <section className="px-6 py-24 md:py-32">
         <div className="container mx-auto grid grid-cols-1 gap-16 sm:grid-cols-2 lg:grid-cols-4">
-          {pillars.map((p, i) => (
-            <div
-              key={p.title}
-              className="flex flex-col items-center text-center opacity-0 animate-fade-in"
-              style={{ animationDelay: `${0.3 + i * 0.15}s` }}
-            >
-              <p.icon className="h-5 w-5 mb-5 opacity-40" strokeWidth={1} />
-              <h3 className="text-[12px] tracking-[0.12em] uppercase font-light mb-3">{p.title}</h3>
-              <p className="text-sm text-muted-foreground font-light">{p.desc}</p>
-            </div>
-          ))}
+          {pillars.map((p, i) => {
+            const Wrapper = p.to ? Link : 'div';
+            const wrapperProps = p.to ? { to: p.to } : {};
+            return (
+              <Wrapper
+                key={p.title}
+                {...(wrapperProps as any)}
+                className={`flex flex-col items-center text-center opacity-0 animate-fade-in ${p.to ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''}`}
+                style={{ animationDelay: `${0.3 + i * 0.15}s` }}
+              >
+                <p.icon className="h-5 w-5 mb-5 opacity-40" strokeWidth={1} />
+                <h3 className="text-[12px] tracking-[0.12em] uppercase font-light mb-3">{p.title}</h3>
+                <p className="text-sm text-muted-foreground font-light">{p.desc}</p>
+              </Wrapper>
+            );
+          })}
         </div>
       </section>
 
