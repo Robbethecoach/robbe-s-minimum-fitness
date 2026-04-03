@@ -41,15 +41,15 @@ const Auth = () => {
   };
 
   const inputClass =
-    'w-full border border-border bg-transparent px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-foreground';
+    'w-full border border-[rgba(242,237,228,0.2)] bg-transparent px-4 py-3 text-sm font-light text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[rgba(242,237,228,0.6)] rounded-[2px]';
 
   return (
     <div className="flex min-h-screen items-center justify-center px-6 pt-14">
       <div className="w-full max-w-sm">
-        <h1 className="font-serif text-3xl mb-8 text-center">
+        <h1 className="font-serif italic text-3xl md:text-4xl mb-10 text-center">
           {isSignUp ? 'Create account' : 'Sign in'}
         </h1>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           <input
             type="email"
             placeholder="Email"
@@ -67,19 +67,19 @@ const Auth = () => {
             required
             minLength={6}
           />
-          {error && <p className="text-sm text-destructive">{error}</p>}
-          {message && <p className="text-sm text-muted-foreground">{message}</p>}
+          {error && <p className="text-sm font-light text-destructive">{error}</p>}
+          {message && <p className="text-sm font-light text-muted-foreground">{message}</p>}
           <button
             type="submit"
             disabled={loading}
-            className="border border-foreground px-8 py-3 text-xs tracking-[0.12em] uppercase transition-colors hover:bg-foreground hover:text-background disabled:opacity-40"
+            className="border border-foreground/80 bg-transparent px-8 py-[14px] text-[13px] font-light tracking-[0.1em] uppercase transition-colors hover:bg-foreground hover:text-primary-foreground disabled:opacity-40 rounded-[2px]"
           >
             {loading ? '...' : isSignUp ? 'Sign up' : 'Sign in'}
           </button>
         </form>
         <button
           onClick={() => { setIsSignUp(!isSignUp); setError(''); setMessage(''); }}
-          className="mt-6 block w-full text-center text-xs text-muted-foreground tracking-[0.08em] uppercase hover:text-foreground transition-colors"
+          className="mt-8 block w-full text-center text-[12px] font-light text-muted-foreground tracking-[0.1em] uppercase hover:text-foreground transition-colors"
         >
           {isSignUp ? 'Already have an account? Sign in' : 'Need an account? Sign up'}
         </button>

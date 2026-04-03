@@ -1,55 +1,49 @@
+@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;1,400&family=Outfit:wght@200;300;400&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@font-face {
-  font-family: 'Helvetica Neue';
-  src: url('/fonts/HelveticaNeue_Medium.ttf') format('truetype');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
 @layer base {
   :root {
-    --background: 222 52% 12%;
-    --foreground: 40 6% 89%;
+    --background: 224 65% 12%;
+    --foreground: 36 8% 90%;
 
-    --card: 222 52% 15%;
-    --card-foreground: 40 6% 89%;
+    --card: 60 5% 8%;
+    --card-foreground: 36 8% 90%;
 
-    --popover: 222 52% 15%;
-    --popover-foreground: 40 6% 89%;
+    --popover: 60 5% 8%;
+    --popover-foreground: 36 8% 90%;
 
-    --primary: 40 6% 89%;
-    --primary-foreground: 222 52% 12%;
+    --primary: 36 8% 90%;
+    --primary-foreground: 224 65% 12%;
 
-    --secondary: 222 40% 20%;
-    --secondary-foreground: 40 6% 89%;
+    --secondary: 224 40% 18%;
+    --secondary-foreground: 36 8% 90%;
 
-    --muted: 222 30% 22%;
-    --muted-foreground: 220 10% 60%;
+    --muted: 224 20% 20%;
+    --muted-foreground: 30 5% 53%;
 
-    --accent: 222 40% 25%;
-    --accent-foreground: 40 6% 89%;
+    --accent: 36 30% 94%;
+    --accent-foreground: 224 65% 12%;
 
     --destructive: 0 62% 50%;
-    --destructive-foreground: 40 6% 89%;
+    --destructive-foreground: 36 8% 90%;
 
-    --border: 222 30% 22%;
-    --input: 222 30% 25%;
-    --ring: 40 6% 89%;
+    --border: 36 30% 94% / 0.1;
+    --input: 36 30% 94% / 0.2;
+    --ring: 36 8% 90%;
 
-    --radius: 0.25rem;
+    --radius: 2px;
 
-    --sidebar-background: 222 52% 10%;
-    --sidebar-foreground: 40 6% 89%;
-    --sidebar-primary: 40 6% 89%;
-    --sidebar-primary-foreground: 222 52% 12%;
-    --sidebar-accent: 222 40% 20%;
-    --sidebar-accent-foreground: 40 6% 89%;
-    --sidebar-border: 222 30% 22%;
-    --sidebar-ring: 40 6% 89%;
+    --sidebar-background: 224 65% 10%;
+    --sidebar-foreground: 36 8% 90%;
+    --sidebar-primary: 36 8% 90%;
+    --sidebar-primary-foreground: 224 65% 12%;
+    --sidebar-accent: 224 40% 18%;
+    --sidebar-accent-foreground: 36 8% 90%;
+    --sidebar-border: 36 30% 94% / 0.08;
+    --sidebar-ring: 36 8% 90%;
   }
 }
 
@@ -60,12 +54,22 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Helvetica Neue', 'Helvetica', Arial, sans-serif;
-    font-weight: 500;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 300;
+    line-height: 1.8;
   }
 
-  h1, h2, h3 {
-    font-family: Georgia, 'Times New Roman', serif;
-    letter-spacing: -0.02em;
+  h1, h2 {
+    font-family: 'Bodoni Moda', serif;
+    font-style: italic;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+
+  h3, h4 {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 300;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
   }
 }

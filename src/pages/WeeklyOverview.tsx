@@ -39,16 +39,18 @@ const WeeklyOverview = () => {
     setSubmitting(false);
   };
 
-  const sliderClass = 'w-full h-1 appearance-none bg-border rounded-none cursor-pointer accent-foreground [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-foreground';
+  const sliderClass = 'w-full h-px appearance-none bg-[rgba(242,237,228,0.2)] cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-foreground [&::-webkit-slider-runnable-track]:bg-transparent';
+
+  const labelClass = 'text-[12px] font-light tracking-[0.1em] uppercase text-muted-foreground mb-4 block';
 
   return (
-    <div className="min-h-screen px-6 pt-24 pb-16">
+    <div className="min-h-screen px-6 pt-28 pb-20">
       <div className="container mx-auto max-w-lg">
-        <h1 className="font-serif text-4xl mb-12">Weekly overview</h1>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-10">
+        <h1 className="font-serif italic text-4xl md:text-5xl mb-16">Weekly overview</h1>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-12">
           {/* Workouts */}
           <div>
-            <label className="text-xs tracking-[0.1em] uppercase text-muted-foreground mb-3 block">
+            <label className={labelClass}>
               Workouts completed this week
             </label>
             <div className="flex gap-2">
@@ -57,10 +59,10 @@ const WeeklyOverview = () => {
                   key={n}
                   type="button"
                   onClick={() => setWorkouts(n)}
-                  className={`h-10 w-10 border text-sm transition-colors ${
+                  className={`h-10 w-10 border text-sm font-light transition-colors rounded-[2px] ${
                     workouts === n
-                      ? 'border-foreground bg-foreground text-background'
-                      : 'border-border hover:border-foreground'
+                      ? 'border-foreground bg-foreground text-primary-foreground'
+                      : 'border-[rgba(242,237,228,0.2)] hover:border-[rgba(242,237,228,0.6)]'
                   }`}
                 >
                   {n}
@@ -71,7 +73,7 @@ const WeeklyOverview = () => {
 
           {/* Nutrition */}
           <div>
-            <label className="text-xs tracking-[0.1em] uppercase text-muted-foreground mb-3 block">
+            <label className={labelClass}>
               Nutrition adherence — {nutrition}/10
             </label>
             <input
@@ -86,7 +88,7 @@ const WeeklyOverview = () => {
 
           {/* Sleep */}
           <div>
-            <label className="text-xs tracking-[0.1em] uppercase text-muted-foreground mb-3 block">
+            <label className={labelClass}>
               Sleep quality — {sleep}/10
             </label>
             <input
@@ -101,7 +103,7 @@ const WeeklyOverview = () => {
 
           {/* Energy */}
           <div>
-            <label className="text-xs tracking-[0.1em] uppercase text-muted-foreground mb-3 block">
+            <label className={labelClass}>
               Energy levels — {energy}/10
             </label>
             <input
@@ -116,14 +118,14 @@ const WeeklyOverview = () => {
 
           {/* Hard this week */}
           <div>
-            <label className="text-xs tracking-[0.1em] uppercase text-muted-foreground mb-3 block">
+            <label className={labelClass}>
               What felt hard this week?
             </label>
             <textarea
               value={hardText}
               onChange={(e) => setHardText(e.target.value)}
               rows={4}
-              className="w-full border border-border bg-transparent px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-foreground resize-none"
+              className="w-full border border-[rgba(242,237,228,0.2)] bg-transparent px-4 py-3 text-sm font-light text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[rgba(242,237,228,0.6)] resize-none rounded-[2px]"
               placeholder="Be honest with yourself..."
             />
           </div>
@@ -131,7 +133,7 @@ const WeeklyOverview = () => {
           <button
             type="submit"
             disabled={submitting}
-            className="border border-foreground px-8 py-3 text-xs tracking-[0.12em] uppercase transition-colors hover:bg-foreground hover:text-background disabled:opacity-40 self-start"
+            className="border border-foreground/80 bg-transparent px-8 py-[14px] text-[13px] font-light tracking-[0.1em] uppercase transition-colors hover:bg-foreground hover:text-primary-foreground disabled:opacity-40 self-start rounded-[2px]"
           >
             {submitting ? 'Saving...' : 'Submit week'}
           </button>
