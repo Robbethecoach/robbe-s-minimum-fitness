@@ -26,11 +26,17 @@ const Navbar = () => {
         <div className="flex items-center gap-8">
           {user && (
             <>
+              <Link to="/move" className={linkClass('/move')}>
+                Move
+              </Link>
+              <Link to="/fuel" className={linkClass('/fuel')}>
+                Fuel
+              </Link>
+              <Link to="/chain" className={linkClass('/chain')}>
+                Chain
+              </Link>
               <Link to="/weekly" className={linkClass('/weekly')}>
                 Weekly
-              </Link>
-              <Link to="/library" className={linkClass('/library')}>
-                Library
               </Link>
             </>
           )}
