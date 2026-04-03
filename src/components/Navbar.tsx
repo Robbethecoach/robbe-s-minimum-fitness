@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 const Navbar = () => {
   const { user, signOut } = useAuth();
   const location = useLocation();
+  const isHome = location.pathname === '/';
 
   const linkClass = (path: string) =>
     `text-[13px] font-light tracking-[0.1em] uppercase transition-opacity hover:opacity-100 ${
@@ -11,7 +12,13 @@ const Navbar = () => {
     }`;
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0c0c0b] border-b border-[rgba(242,237,228,0.08)]">
+    <nav
+      className={`fixed top-0 left-0 right-0 z-50 transition-colors ${
+        isHome
+          ? 'bg-transparent'
+          : 'bg-[#0c0c0b] border-b border-[rgba(242,237,228,0.08)]'
+      }`}
+    >
       <div className="container mx-auto flex h-14 items-center justify-between px-6">
         <Link to="/" className="font-serif italic text-[20px] font-normal">
           robbethecoach
