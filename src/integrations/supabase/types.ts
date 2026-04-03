@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      accessory_library: {
+        Row: {
+          coaching_note: string | null
+          created_at: string
+          id: string
+          name: string
+          target_area: string
+          youtube_url: string | null
+        }
+        Insert: {
+          coaching_note?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          target_area?: string
+          youtube_url?: string | null
+        }
+        Update: {
+          coaching_note?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          target_area?: string
+          youtube_url?: string | null
+        }
+        Relationships: []
+      }
       chain_tasks: {
         Row: {
           created_at: string
@@ -100,6 +127,92 @@ export type Database = {
         }
         Relationships: []
       }
+      exercises: {
+        Row: {
+          alternative_coaching_note: string | null
+          alternative_name: string | null
+          alternative_youtube_url: string | null
+          coaching_note: string | null
+          created_at: string
+          id: string
+          name: string
+          order_index: number
+          reps: string
+          sets: number
+          type: string
+          workout_block_id: string
+          youtube_url: string | null
+        }
+        Insert: {
+          alternative_coaching_note?: string | null
+          alternative_name?: string | null
+          alternative_youtube_url?: string | null
+          coaching_note?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          order_index?: number
+          reps?: string
+          sets?: number
+          type?: string
+          workout_block_id: string
+          youtube_url?: string | null
+        }
+        Update: {
+          alternative_coaching_note?: string | null
+          alternative_name?: string | null
+          alternative_youtube_url?: string | null
+          coaching_note?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          order_index?: number
+          reps?: string
+          sets?: number
+          type?: string
+          workout_block_id?: string
+          youtube_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exercises_workout_block_id_fkey"
+            columns: ["workout_block_id"]
+            isOneToOne: false
+            referencedRelation: "workout_blocks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mobility_flows: {
+        Row: {
+          created_at: string
+          description: string
+          duration_minutes: number
+          id: string
+          tag: string
+          title: string
+          youtube_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string
+          duration_minutes?: number
+          id?: string
+          tag?: string
+          title: string
+          youtube_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          duration_minutes?: number
+          id?: string
+          tag?: string
+          title?: string
+          youtube_url?: string | null
+        }
+        Relationships: []
+      }
       recipes: {
         Row: {
           cook_time: number | null
@@ -142,6 +255,77 @@ export type Database = {
         }
         Relationships: []
       }
+      user_profiles: {
+        Row: {
+          created_at: string
+          equipment_access: string
+          experience_level: string
+          id: string
+          onboarding_completed: boolean
+          preferred_days: string[]
+          training_start_date: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          equipment_access?: string
+          experience_level?: string
+          id?: string
+          onboarding_completed?: boolean
+          preferred_days?: string[]
+          training_start_date?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          equipment_access?: string
+          experience_level?: string
+          id?: string
+          onboarding_completed?: boolean
+          preferred_days?: string[]
+          training_start_date?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_workout_completions: {
+        Row: {
+          completed_at: string
+          day_date: string
+          id: string
+          user_id: string
+          week_number: number
+          workout_block_id: string
+        }
+        Insert: {
+          completed_at?: string
+          day_date: string
+          id?: string
+          user_id: string
+          week_number: number
+          workout_block_id: string
+        }
+        Update: {
+          completed_at?: string
+          day_date?: string
+          id?: string
+          user_id?: string
+          week_number?: number
+          workout_block_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_workout_completions_workout_block_id_fkey"
+            columns: ["workout_block_id"]
+            isOneToOne: false
+            referencedRelation: "workout_blocks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       weekly_checkins: {
         Row: {
           created_at: string
@@ -172,6 +356,30 @@ export type Database = {
           sleep_quality?: number
           user_id?: string
           workouts_completed?: number
+        }
+        Relationships: []
+      }
+      workout_blocks: {
+        Row: {
+          created_at: string
+          day_type: string
+          id: string
+          week_number: number
+          workout_name: string
+        }
+        Insert: {
+          created_at?: string
+          day_type: string
+          id?: string
+          week_number: number
+          workout_name: string
+        }
+        Update: {
+          created_at?: string
+          day_type?: string
+          id?: string
+          week_number?: number
+          workout_name?: string
         }
         Relationships: []
       }
