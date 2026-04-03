@@ -69,7 +69,7 @@ const Index = () => {
       {/* Footer */}
       <footer className="px-6 py-12 text-center">
         <p className="text-[11px] text-muted-foreground tracking-[0.1em] uppercase font-light">
-          Robbethecoach — Built on Zweet Club
+          ROBBETHECOACH — FOUNDER OF ZWEET CLUB
         </p>
       </footer>
     </div>
