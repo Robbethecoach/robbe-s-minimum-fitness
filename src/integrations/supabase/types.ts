@@ -127,6 +127,42 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_thoughts: {
+        Row: {
+          attribution: string | null
+          caption: string | null
+          content: string | null
+          content_type: string
+          created_at: string
+          id: string
+          image_url: string | null
+          layout_order: string | null
+          publish_date: string
+        }
+        Insert: {
+          attribution?: string | null
+          caption?: string | null
+          content?: string | null
+          content_type?: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          layout_order?: string | null
+          publish_date: string
+        }
+        Update: {
+          attribution?: string | null
+          caption?: string | null
+          content?: string | null
+          content_type?: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          layout_order?: string | null
+          publish_date?: string
+        }
+        Relationships: []
+      }
       exercises: {
         Row: {
           alternative_coaching_note: string | null
