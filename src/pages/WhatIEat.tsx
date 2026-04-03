@@ -173,6 +173,6 @@ const RecipeCard = ({ recipe }: { recipe: Recipe }) => {
   );
 };
 
-import { useState } from 'react';
+
 
 export default WhatIEat;
