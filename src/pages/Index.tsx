@@ -3,10 +3,10 @@ import { Dumbbell, Apple, Link2, Brain } from 'lucide-react';
 import heroImage from '@/assets/hero.jpg';
 
 const pillars = [
-  { icon: Dumbbell, title: 'Move', desc: 'Training for life.' },
-  { icon: Apple, title: 'Fuel', desc: 'Sustainable nutrition.' },
-  { icon: Link2, title: 'The Chain', desc: 'Building momentum.' },
-  { icon: Brain, title: 'Think', desc: "As you think, you'll become." },
+  { icon: Dumbbell, title: 'Move', desc: 'Training for life.', to: undefined },
+  { icon: Apple, title: 'Fuel', desc: 'Sustainable nutrition.', to: '/fuel' },
+  { icon: Link2, title: 'The Chain', desc: 'Building momentum.', to: undefined },
+  { icon: Brain, title: 'Think', desc: "As you think, you'll become.", to: undefined },
 ];
 
 const Index = () => {
