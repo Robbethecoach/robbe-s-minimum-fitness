@@ -5,7 +5,7 @@ const pillars = [
   { icon: Dumbbell, title: 'Move', desc: 'Training for life.' },
   { icon: Apple, title: 'Fuel', desc: 'Sustainable nutrition.' },
   { icon: Link2, title: 'The Chain', desc: 'Building momentum.' },
-  { icon: Brain, title: 'Think', desc: 'As you think, you'll become.' },
+  { icon: Brain, title: 'Think', desc: "As you think, you'll become." },
 ];
 
 const Index = () => {
