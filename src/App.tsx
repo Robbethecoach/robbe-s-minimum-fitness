@@ -15,6 +15,7 @@ import WhatIEat from "./pages/WhatIEat";
 import TheChain from "./pages/TheChain";
 import Move from "./pages/Move";
 import Onboarding from "./pages/Onboarding";
+import Think from "./pages/Think";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
