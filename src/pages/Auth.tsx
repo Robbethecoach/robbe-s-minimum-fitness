@@ -1,8 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { useEffect } from 'react';
 
 const Auth = () => {
   const [email, setEmail] = useState('');
@@ -15,7 +14,20 @@ const Auth = () => {
   const { user } = useAuth();
 
   useEffect(() => {
-    if (user) navigate('/weekly');
+    if (!user) return;
+    // Check if user has completed onboarding
+    supabase
+      .from('user_profiles')
+      .select('onboarding_completed')
+      .eq('user_id', user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!data || !data.onboarding_completed) {
+          navigate('/onboarding');
+        } else {
+          navigate('/move');
+        }
+      });
   }, [user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
