@@ -19,7 +19,7 @@ const Index = () => {
           src={heroImage}
           alt="Runner ascending through morning fog"
           className="absolute inset-0 w-full h-full object-cover"
-          style={{ objectPosition: 'center 80%' }}
+          style={{ objectPosition: 'center 95%' }}
         />
         {/* Dark overlay for text legibility */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a1432] via-[#0a1432]/40 to-transparent" />
