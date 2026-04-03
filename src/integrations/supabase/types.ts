@@ -14,7 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      content_library: {
+        Row: {
+          body: string
+          created_at: string
+          description: string
+          id: string
+          pillar: string
+          title: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          description: string
+          id?: string
+          pillar: string
+          title: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          description?: string
+          id?: string
+          pillar?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      weekly_checkins: {
+        Row: {
+          created_at: string
+          energy_levels: number
+          hard_this_week: string | null
+          id: string
+          nutrition_adherence: number
+          sleep_quality: number
+          user_id: string
+          workouts_completed: number
+        }
+        Insert: {
+          created_at?: string
+          energy_levels?: number
+          hard_this_week?: string | null
+          id?: string
+          nutrition_adherence?: number
+          sleep_quality?: number
+          user_id: string
+          workouts_completed?: number
+        }
+        Update: {
+          created_at?: string
+          energy_levels?: number
+          hard_this_week?: string | null
+          id?: string
+          nutrition_adherence?: number
+          sleep_quality?: number
+          user_id?: string
+          workouts_completed?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
