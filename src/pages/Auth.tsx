@@ -47,7 +47,6 @@ const Auth = () => {
     } else {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) setError(error.message);
-      else navigate('/weekly');
     }
     setLoading(false);
   };
