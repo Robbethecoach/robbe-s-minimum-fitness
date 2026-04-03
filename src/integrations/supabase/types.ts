@@ -14,6 +14,65 @@ export type Database = {
   }
   public: {
     Tables: {
+      chain_tasks: {
+        Row: {
+          created_at: string
+          day_date: string
+          id: string
+          sort_order: number
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          day_date: string
+          id?: string
+          sort_order?: number
+          title: string
+        }
+        Update: {
+          created_at?: string
+          day_date?: string
+          id?: string
+          sort_order?: number
+          title?: string
+        }
+        Relationships: []
+      }
+      chain_user_progress: {
+        Row: {
+          created_at: string
+          day_date: string
+          id: string
+          status: string
+          task_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          day_date: string
+          id?: string
+          status?: string
+          task_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          day_date?: string
+          id?: string
+          status?: string
+          task_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chain_user_progress_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "chain_tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       content_library: {
         Row: {
           body: string
