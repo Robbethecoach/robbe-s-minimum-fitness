@@ -41,6 +41,48 @@ export type Database = {
         }
         Relationships: []
       }
+      recipes: {
+        Row: {
+          cook_time: number | null
+          created_at: string
+          description: string
+          id: string
+          image_url: string | null
+          ingredients: string
+          instructions: string
+          prep_time: number | null
+          servings: number | null
+          title: string
+          week_label: string | null
+        }
+        Insert: {
+          cook_time?: number | null
+          created_at?: string
+          description?: string
+          id?: string
+          image_url?: string | null
+          ingredients?: string
+          instructions?: string
+          prep_time?: number | null
+          servings?: number | null
+          title: string
+          week_label?: string | null
+        }
+        Update: {
+          cook_time?: number | null
+          created_at?: string
+          description?: string
+          id?: string
+          image_url?: string | null
+          ingredients?: string
+          instructions?: string
+          prep_time?: number | null
+          servings?: number | null
+          title?: string
+          week_label?: string | null
+        }
+        Relationships: []
+      }
       weekly_checkins: {
         Row: {
           created_at: string
