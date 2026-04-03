@@ -8,7 +8,7 @@ const pillars = [
   { icon: Dumbbell, title: 'Move', desc: 'Training for life.', to: '/move' },
   { icon: Apple, title: 'Fuel', desc: 'Sustainable nutrition.', to: '/fuel' },
   { icon: Link2, title: 'The Chain', desc: 'Building momentum.', to: '/chain' },
-  { icon: Brain, title: 'Think', desc: "As you think, you'll become.", to: undefined as string | undefined },
+  { icon: Brain, title: 'Think', desc: "As you think, you'll become.", to: '/think' },
 ];
 
 const Index = () => {
