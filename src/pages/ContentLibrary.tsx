@@ -37,8 +37,8 @@ const seedContent: ContentItem[] = [
     id: '3',
     title: 'Identity Precedes Behaviour',
     pillar: 'Think',
-    description: 'You don't rise to your goals. You fall to your identity.',
-    body: `Every action you take is a vote for the person you want to become. Skip a workout? That's a vote for "someone who doesn't train." Show up even when you don't feel like it? That's a vote for discipline.\n\nThe mindset shift isn't about motivation — motivation is unreliable. It's about identity. When you see yourself as someone who moves, fuels well, and recovers intentionally, the behaviours follow.\n\nStart small. One rep. One good meal. One early night. Stack the votes.`,
+    description: "You don't rise to your goals. You fall to your identity.",
+    body: "Every action you take is a vote for the person you want to become. Skip a workout? That's a vote for \"someone who doesn't train.\" Show up even when you don't feel like it? That's a vote for discipline.\n\nThe mindset shift isn't about motivation \u2014 motivation is unreliable. It's about identity. When you see yourself as someone who moves, fuels well, and recovers intentionally, the behaviours follow.\n\nStart small. One rep. One good meal. One early night. Stack the votes.",
   },
 ];
 
