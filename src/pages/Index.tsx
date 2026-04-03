@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Dumbbell, Apple, Link2, Brain } from 'lucide-react';
+import heroImage from '@/assets/hero.jpg';
 
 const pillars = [
   { icon: Dumbbell, title: 'Move', desc: 'Training for life.' },
@@ -10,29 +11,43 @@ const pillars = [
 
 const Index = () => {
   return (
-    <div className="min-h-screen pt-14">
-      {/* Hero */}
-      <section className="flex min-h-[calc(100vh-56px)] flex-col items-center justify-center px-6 text-center">
-        <h1 className="font-serif italic text-5xl md:text-7xl leading-tight max-w-3xl animate-fade-in">
-          A generalist approach to fitness
-        </h1>
-        <p className="mt-8 text-[13px] tracking-[0.12em] uppercase text-muted-foreground font-light opacity-0 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-          The minimum viable workout.
-        </p>
-        <Link
-          to="/auth"
-          className="mt-14 inline-block border border-foreground/80 bg-transparent px-8 py-[14px] text-[13px] font-light tracking-[0.1em] uppercase transition-colors hover:bg-foreground hover:text-primary-foreground rounded-[2px] opacity-0 animate-fade-in"
-          style={{ animationDelay: '0.4s' }}
-        >
-          Join Robbethecoach
-        </Link>
+    <div className="min-h-screen">
+      {/* Hero — full viewport with image */}
+      <section className="relative h-screen w-full overflow-hidden">
+        {/* Background image */}
+        <img
+          src={heroImage}
+          alt="Runner ascending through morning fog"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        {/* Dark overlay for text legibility */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0a1432] via-[#0a1432]/40 to-transparent" />
+
+        {/* Hero content — bottom-left aligned like Cadence */}
+        <div className="absolute bottom-0 left-0 right-0 px-6 pb-16 md:pb-20">
+          <div className="container mx-auto">
+            <h1 className="font-serif italic text-4xl sm:text-5xl md:text-7xl leading-[1.1] max-w-2xl animate-fade-in">
+              A generalist approach to fitness
+            </h1>
+            <p className="mt-5 text-[13px] tracking-[0.12em] uppercase font-light opacity-60 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+              The minimum viable workout.
+            </p>
+            <Link
+              to="/auth"
+              className="mt-8 inline-block border border-foreground/70 bg-transparent px-8 py-[14px] text-[13px] font-light tracking-[0.1em] uppercase transition-colors hover:bg-foreground hover:text-primary-foreground rounded-[2px] opacity-0 animate-fade-in"
+              style={{ animationDelay: '0.4s' }}
+            >
+              Join Robbethecoach
+            </Link>
+          </div>
+        </div>
       </section>
 
       {/* Divider */}
       <div className="w-full h-px bg-[rgba(242,237,228,0.08)]" />
 
       {/* Pillars */}
-      <section className="px-6 py-20 md:py-28">
+      <section className="px-6 py-24 md:py-32">
         <div className="container mx-auto grid grid-cols-1 gap-16 sm:grid-cols-2 lg:grid-cols-4">
           {pillars.map((p, i) => (
             <div
