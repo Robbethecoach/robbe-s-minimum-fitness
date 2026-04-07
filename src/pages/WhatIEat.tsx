@@ -20,37 +20,30 @@ const WhatIEat = () => {
   return (
     <div className="min-h-screen pt-24 md:pt-32">
       <div className="container mx-auto max-w-[1100px] px-6">
-        {/* Back link */}
         <Link
           to="/fuel"
-          className="inline-flex items-center gap-2 text-[12px] tracking-[0.1em] uppercase font-light opacity-40 hover:opacity-70 transition-opacity mb-12"
+          className="inline-flex items-center gap-2 text-[12px] tracking-[0.08em] uppercase font-medium text-muted-foreground hover:text-foreground transition-colors mb-12"
         >
           <ArrowLeft className="h-3.5 w-3.5" strokeWidth={1.5} />
           Fuel
         </Link>
 
-        {/* Title */}
         <div className="mb-16 max-w-2xl">
           <h1 className="font-serif italic text-4xl md:text-5xl leading-[1.15] mb-6">
             What I eat
           </h1>
-          <p className="text-sm text-muted-foreground font-light leading-[1.8]">
+          <p className="text-sm text-muted-foreground leading-[1.8]">
             A growing archive of weekly recipes — simple, high-protein, built for
             real life.
           </p>
         </div>
 
-        {/* Divider */}
-        <div className="w-full h-px bg-[rgba(242,237,228,0.08)] mb-16" />
+        <div className="w-full h-px bg-border mb-16" />
 
-        {/* Recipes grid */}
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {[1, 2, 3, 4].map((i) => (
-              <div
-                key={i}
-                className="border border-[rgba(242,237,228,0.08)] rounded-[4px] bg-card p-8 animate-pulse h-56"
-              />
+              <div key={i} className="border border-border rounded-lg bg-card p-8 animate-pulse h-56" />
             ))}
           </div>
         ) : recipes && recipes.length > 0 ? (
@@ -61,17 +54,16 @@ const WhatIEat = () => {
           </div>
         ) : (
           <div className="text-center py-20">
-            <p className="text-muted-foreground font-light text-sm">
+            <p className="text-muted-foreground text-sm">
               First recipes dropping soon.
             </p>
           </div>
         )}
       </div>
 
-      {/* Footer */}
-      <div className="mt-24 md:mt-32 w-full h-px bg-[rgba(242,237,228,0.08)]" />
+      <div className="mt-24 md:mt-32 w-full h-px bg-border" />
       <footer className="px-6 py-12 text-center">
-        <p className="text-[11px] text-muted-foreground tracking-[0.1em] uppercase font-light">
+        <p className="text-[11px] text-muted-foreground tracking-[0.08em] uppercase font-medium">
           ROBBETHECOACH — FOUNDER OF ZWEET CLUB
         </p>
       </footer>
@@ -97,31 +89,24 @@ const RecipeCard = ({ recipe }: { recipe: Recipe }) => {
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <div className="border border-[rgba(242,237,228,0.08)] rounded-[4px] bg-card overflow-hidden">
+    <div className="border border-border rounded-lg bg-card overflow-hidden">
       {recipe.image_url && (
         <div className="aspect-[16/9] overflow-hidden">
-          <img
-            src={recipe.image_url}
-            alt={recipe.title}
-            className="w-full h-full object-cover"
-          />
+          <img src={recipe.image_url} alt={recipe.title} className="w-full h-full object-cover" />
         </div>
       )}
       <div className="p-8">
         {recipe.week_label && (
-          <p className="text-[11px] tracking-[0.12em] uppercase font-light opacity-40 mb-3">
+          <p className="text-[11px] tracking-[0.08em] uppercase font-medium text-muted-foreground mb-3">
             {recipe.week_label}
           </p>
         )}
         <h3 className="font-serif italic text-xl mb-2">{recipe.title}</h3>
         {recipe.description && (
-          <p className="text-[13px] text-muted-foreground font-light leading-[1.8] mb-4">
-            {recipe.description}
-          </p>
+          <p className="text-[13px] text-muted-foreground leading-[1.8] mb-4">{recipe.description}</p>
         )}
 
-        {/* Meta */}
-        <div className="flex items-center gap-5 text-[11px] text-muted-foreground tracking-[0.1em] uppercase font-light mb-4">
+        <div className="flex items-center gap-5 text-[11px] text-muted-foreground tracking-[0.08em] uppercase font-medium mb-4">
           {recipe.prep_time && (
             <span className="flex items-center gap-1.5">
               <Clock className="h-3 w-3" strokeWidth={1.5} />
@@ -136,34 +121,25 @@ const RecipeCard = ({ recipe }: { recipe: Recipe }) => {
           )}
         </div>
 
-        {/* Expand / collapse */}
         <button
           onClick={() => setExpanded(!expanded)}
-          className="text-[12px] tracking-[0.1em] uppercase font-light opacity-50 hover:opacity-80 transition-opacity"
+          className="text-[12px] tracking-[0.08em] uppercase font-medium text-muted-foreground hover:text-foreground transition-colors"
         >
           {expanded ? 'Collapse' : 'View recipe'}
         </button>
 
         {expanded && (
-          <div className="mt-6 pt-6 border-t border-[rgba(242,237,228,0.08)] space-y-6">
+          <div className="mt-6 pt-6 border-t border-border space-y-6">
             {recipe.ingredients && (
               <div>
-                <h4 className="text-[12px] tracking-[0.12em] uppercase font-light opacity-50 mb-3">
-                  Ingredients
-                </h4>
-                <p className="text-[13px] font-light leading-[1.9] text-muted-foreground whitespace-pre-line">
-                  {recipe.ingredients}
-                </p>
+                <h4 className="text-[12px] tracking-[0.08em] uppercase font-medium text-muted-foreground mb-3">Ingredients</h4>
+                <p className="text-[13px] leading-[1.9] text-muted-foreground whitespace-pre-line">{recipe.ingredients}</p>
               </div>
             )}
             {recipe.instructions && (
               <div>
-                <h4 className="text-[12px] tracking-[0.12em] uppercase font-light opacity-50 mb-3">
-                  Instructions
-                </h4>
-                <p className="text-[13px] font-light leading-[1.9] text-muted-foreground whitespace-pre-line">
-                  {recipe.instructions}
-                </p>
+                <h4 className="text-[12px] tracking-[0.08em] uppercase font-medium text-muted-foreground mb-3">Instructions</h4>
+                <p className="text-[13px] leading-[1.9] text-muted-foreground whitespace-pre-line">{recipe.instructions}</p>
               </div>
             )}
           </div>
@@ -172,7 +148,5 @@ const RecipeCard = ({ recipe }: { recipe: Recipe }) => {
     </div>
   );
 };
-
-
 
 export default WhatIEat;

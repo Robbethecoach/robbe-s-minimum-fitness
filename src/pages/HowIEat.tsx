@@ -4,28 +4,24 @@ import { ArrowLeft } from 'lucide-react';
 const HowIEat = () => (
   <div className="min-h-screen pt-24 md:pt-32">
     <div className="container mx-auto max-w-[760px] px-6">
-      {/* Back link */}
       <Link
         to="/fuel"
-        className="inline-flex items-center gap-2 text-[12px] tracking-[0.1em] uppercase font-light opacity-40 hover:opacity-70 transition-opacity mb-12"
+        className="inline-flex items-center gap-2 text-[12px] tracking-[0.08em] uppercase font-medium text-muted-foreground hover:text-foreground transition-colors mb-12"
       >
         <ArrowLeft className="h-3.5 w-3.5" strokeWidth={1.5} />
         Fuel
       </Link>
 
-      {/* Title */}
       <h1 className="font-serif italic text-4xl md:text-5xl leading-[1.15] mb-6">
         How I eat
       </h1>
-      <p className="text-[12px] tracking-[0.12em] uppercase font-light opacity-40 mb-16">
+      <p className="text-[12px] tracking-[0.08em] uppercase font-medium text-muted-foreground mb-16">
         My philosophy on nutrition
       </p>
 
-      {/* Divider */}
-      <div className="w-full h-px bg-[rgba(242,237,228,0.08)] mb-16" />
+      <div className="w-full h-px bg-border mb-16" />
 
-      {/* Article body */}
-      <article className="prose-custom space-y-8 text-[15px] font-light leading-[1.9] text-muted-foreground">
+      <article className="space-y-8 text-[15px] leading-[1.9] text-muted-foreground">
         <p>
           I don't believe in diets. I believe in principles — a small set of
           non-negotiable guidelines that stay consistent whether I'm travelling,
@@ -72,18 +68,17 @@ const HowIEat = () => (
         </p>
 
         <div className="pt-10">
-          <div className="w-12 h-px bg-[rgba(242,237,228,0.15)]" />
-          <p className="mt-6 text-[12px] tracking-[0.12em] uppercase font-light opacity-30">
+          <div className="w-12 h-px bg-border" />
+          <p className="mt-6 text-[12px] tracking-[0.08em] uppercase font-medium text-muted-foreground">
             This page is a living document — updated as my thinking evolves.
           </p>
         </div>
       </article>
     </div>
 
-    {/* Footer */}
-    <div className="mt-24 md:mt-32 w-full h-px bg-[rgba(242,237,228,0.08)]" />
+    <div className="mt-24 md:mt-32 w-full h-px bg-border" />
     <footer className="px-6 py-12 text-center">
-      <p className="text-[11px] text-muted-foreground tracking-[0.1em] uppercase font-light">
+      <p className="text-[11px] text-muted-foreground tracking-[0.08em] uppercase font-medium">
         ROBBETHECOACH — FOUNDER OF ZWEET CLUB
       </p>
     </footer>

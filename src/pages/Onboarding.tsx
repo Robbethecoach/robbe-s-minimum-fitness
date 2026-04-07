@@ -57,10 +57,10 @@ const Onboarding = () => {
   };
 
   const pillClass = (active: boolean) =>
-    `border px-4 py-2 text-[12px] tracking-[0.1em] uppercase font-light transition-all rounded-[2px] cursor-pointer ${
+    `border px-4 py-2 text-[12px] tracking-[0.08em] uppercase font-medium transition-all rounded-lg cursor-pointer ${
       active
-        ? 'border-foreground/80 bg-foreground/10 text-foreground'
-        : 'border-foreground/20 text-muted-foreground hover:border-foreground/40'
+        ? 'border-accent bg-accent text-accent-foreground'
+        : 'border-border text-muted-foreground hover:border-foreground/30'
     }`;
 
   return (
@@ -69,13 +69,13 @@ const Onboarding = () => {
         <h1 className="font-serif italic text-3xl md:text-4xl mb-3 text-center">
           Let's set you up
         </h1>
-        <p className="text-center text-sm text-muted-foreground font-light mb-12">
+        <p className="text-center text-sm text-muted-foreground mb-12">
           A few quick questions to personalise your training plan.
         </p>
 
         {/* Training days */}
         <div className="mb-10">
-          <p className="text-[12px] tracking-[0.12em] uppercase font-light mb-4">
+          <p className="text-[12px] tracking-[0.08em] uppercase font-medium mb-4">
             Which days do you prefer to train?
           </p>
           <div className="flex flex-wrap gap-2">
@@ -89,12 +89,12 @@ const Onboarding = () => {
               </button>
             ))}
           </div>
-          <p className="text-[11px] text-muted-foreground mt-2 font-light">Pick 4–6 days</p>
+          <p className="text-[11px] text-muted-foreground mt-2">Pick 4–6 days</p>
         </div>
 
         {/* Experience */}
         <div className="mb-10">
-          <p className="text-[12px] tracking-[0.12em] uppercase font-light mb-4">
+          <p className="text-[12px] tracking-[0.08em] uppercase font-medium mb-4">
             What is your training experience?
           </p>
           <div className="flex flex-wrap gap-2">
@@ -112,7 +112,7 @@ const Onboarding = () => {
 
         {/* Equipment */}
         <div className="mb-10">
-          <p className="text-[12px] tracking-[0.12em] uppercase font-light mb-4">
+          <p className="text-[12px] tracking-[0.08em] uppercase font-medium mb-4">
             Do you have access to a gym with barbells?
           </p>
           <div className="flex flex-wrap gap-2">
@@ -128,12 +128,12 @@ const Onboarding = () => {
           </div>
         </div>
 
-        {error && <p className="text-sm font-light text-destructive mb-4">{error}</p>}
+        {error && <p className="text-sm text-destructive mb-4">{error}</p>}
 
         <button
           onClick={handleSubmit}
           disabled={loading}
-          className="w-full border border-foreground/80 bg-transparent px-8 py-[14px] text-[13px] font-light tracking-[0.1em] uppercase transition-colors hover:bg-foreground hover:text-primary-foreground disabled:opacity-40 rounded-[2px]"
+          className="w-full bg-primary text-primary-foreground px-8 py-[14px] text-[13px] font-medium tracking-[0.08em] uppercase transition-colors hover:bg-foreground/90 disabled:opacity-40 rounded-lg"
         >
           {loading ? '...' : 'Start training'}
         </button>

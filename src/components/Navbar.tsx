@@ -7,8 +7,8 @@ const Navbar = () => {
   const isHome = location.pathname === '/';
 
   const linkClass = (path: string) =>
-    `text-[13px] font-light tracking-[0.1em] uppercase transition-opacity hover:opacity-100 ${
-      location.pathname === path ? 'opacity-100' : 'opacity-50'
+    `text-[13px] font-medium tracking-[0.08em] uppercase transition-colors ${
+      location.pathname === path ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
     }`;
 
   return (
@@ -16,11 +16,11 @@ const Navbar = () => {
       className={`fixed top-0 left-0 right-0 z-50 transition-colors ${
         isHome
           ? 'bg-transparent'
-          : 'bg-[#0c0c0b] border-b border-[rgba(242,237,228,0.08)]'
+          : 'bg-background/95 backdrop-blur-sm border-b border-border'
       }`}
     >
       <div className="container mx-auto flex h-14 items-center justify-between px-6">
-        <Link to="/" className="font-serif italic text-[20px] font-normal">
+        <Link to="/" className="font-serif italic text-[20px] font-normal text-foreground">
           robbethecoach
         </Link>
         <div className="flex items-center gap-8">
@@ -31,6 +31,9 @@ const Navbar = () => {
               </Link>
               <Link to="/fuel" className={linkClass('/fuel')}>
                 Fuel
+              </Link>
+              <Link to="/think" className={linkClass('/think')}>
+                Think
               </Link>
               <Link to="/chain" className={linkClass('/chain')}>
                 Chain
@@ -43,7 +46,7 @@ const Navbar = () => {
           {user ? (
             <button
               onClick={signOut}
-              className="text-[13px] font-light tracking-[0.1em] uppercase opacity-50 transition-opacity hover:opacity-100"
+              className="text-[13px] font-medium tracking-[0.08em] uppercase text-muted-foreground transition-colors hover:text-foreground"
             >
               Sign out
             </button>

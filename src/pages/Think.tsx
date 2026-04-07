@@ -22,7 +22,6 @@ const Think = () => {
   const { data: thought, isLoading } = useQuery({
     queryKey: ['daily_thought', today],
     queryFn: async () => {
-      // Try today first
       const { data: todayEntry } = await supabase
         .from('daily_thoughts')
         .select('*')
@@ -31,7 +30,6 @@ const Think = () => {
 
       if (todayEntry) return todayEntry as DailyThought;
 
-      // Fall back to most recent past entry
       const { data: pastEntry } = await supabase
         .from('daily_thoughts')
         .select('*')
@@ -52,51 +50,45 @@ const Think = () => {
   return (
     <div className="min-h-screen pt-14">
       <div className="container mx-auto px-6 py-12 md:py-16 max-w-2xl">
-        {/* Header */}
         <Link
           to="/"
-          className="inline-flex items-center gap-2 text-[12px] tracking-[0.1em] uppercase text-muted-foreground hover:text-foreground transition-colors mb-6"
+          className="inline-flex items-center gap-2 text-[12px] tracking-[0.08em] uppercase font-medium text-muted-foreground hover:text-foreground transition-colors mb-6"
         >
           <ArrowLeft className="h-3.5 w-3.5" strokeWidth={1.5} />
           Back
         </Link>
         <h1 className="font-serif italic text-4xl md:text-5xl mb-12">Think</h1>
 
-        {/* Daily Thought */}
         <section>
-          <h3 className="text-[12px] tracking-[0.12em] uppercase font-light mb-6">
+          <h3 className="text-[12px] tracking-[0.08em] uppercase font-medium mb-6">
             Daily Thought
           </h3>
 
           {isLoading && (
-            <p className="text-sm text-muted-foreground font-light">Loading…</p>
+            <p className="text-sm text-muted-foreground">Loading…</p>
           )}
 
           {!isLoading && !thought && (
-            <p className="text-sm text-muted-foreground font-light">
+            <p className="text-sm text-muted-foreground">
               No thoughts published yet.
             </p>
           )}
 
           {thought && (
-            <div className="border border-foreground/8 rounded-[2px] overflow-hidden">
-              {/* Date label */}
-              <div className="px-5 pt-5 pb-0">
-                <p className="text-[11px] tracking-[0.1em] uppercase text-muted-foreground font-light">
+            <div className="border border-border bg-card rounded-lg overflow-hidden">
+              <div className="px-6 pt-6 pb-0">
+                <p className="text-[11px] tracking-[0.08em] uppercase text-muted-foreground font-medium">
                   {formatDate(thought.publish_date)}
                 </p>
               </div>
 
-              {/* Content */}
-              <div className="p-5">
+              <div className="p-6">
                 {thought.content_type === 'text' && (
                   <TextBlock content={thought.content} attribution={thought.attribution} />
                 )}
-
                 {thought.content_type === 'image' && (
                   <ImageBlock imageUrl={thought.image_url} caption={thought.caption} />
                 )}
-
                 {thought.content_type === 'mixed' && (
                   <MixedBlock
                     content={thought.content}
@@ -115,15 +107,13 @@ const Think = () => {
   );
 };
 
-// ── Content Blocks ────────────────────────────────────
-
 const TextBlock = ({ content, attribution }: { content: string | null; attribution: string | null }) => (
   <div>
     {content && (
-      <p className="text-sm font-light leading-relaxed whitespace-pre-line">{content}</p>
+      <p className="text-sm leading-relaxed whitespace-pre-line">{content}</p>
     )}
     {attribution && (
-      <p className="text-[12px] text-muted-foreground font-light mt-4 italic">
+      <p className="text-[12px] text-muted-foreground mt-4 italic">
         {attribution}
       </p>
     )}
@@ -136,12 +126,12 @@ const ImageBlock = ({ imageUrl, caption }: { imageUrl: string | null; caption: s
       <img
         src={imageUrl}
         alt="Daily thought"
-        className="w-full rounded-[2px]"
+        className="w-full rounded-md"
         loading="lazy"
       />
     )}
     {caption && (
-      <p className="text-[12px] text-muted-foreground font-light mt-3 italic">{caption}</p>
+      <p className="text-[12px] text-muted-foreground mt-3 italic">{caption}</p>
     )}
   </div>
 );
@@ -161,20 +151,12 @@ const MixedBlock = ({
 }) => {
   const textPart = <TextBlock content={content} attribution={attribution} />;
   const imagePart = <ImageBlock imageUrl={imageUrl} caption={caption} />;
-  const divider = <div className="w-full h-px bg-[rgba(242,237,228,0.08)] my-5" />;
+  const divider = <div className="w-full h-px bg-border my-5" />;
 
   return layoutOrder === 'image_first' ? (
-    <div>
-      {imagePart}
-      {divider}
-      {textPart}
-    </div>
+    <div>{imagePart}{divider}{textPart}</div>
   ) : (
-    <div>
-      {textPart}
-      {divider}
-      {imagePart}
-    </div>
+    <div>{textPart}{divider}{imagePart}</div>
   );
 };
 

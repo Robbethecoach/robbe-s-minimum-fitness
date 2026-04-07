@@ -56,15 +56,15 @@ const ContentLibrary = () => {
         <div className="container mx-auto max-w-2xl">
           <button
             onClick={() => setSelected(null)}
-            className="flex items-center gap-2 text-[12px] font-light tracking-[0.1em] uppercase text-muted-foreground hover:text-foreground transition-colors mb-10"
+            className="flex items-center gap-2 text-[12px] font-medium tracking-[0.08em] uppercase text-muted-foreground hover:text-foreground transition-colors mb-10"
           >
             <X className="h-3 w-3" /> Back to library
           </button>
-          <span className="text-[11px] font-light tracking-[0.12em] uppercase text-muted-foreground mb-5 block">
+          <span className="text-[11px] font-medium tracking-[0.08em] uppercase text-muted-foreground mb-5 block">
             {selected.pillar}
           </span>
           <h1 className="font-serif italic text-4xl md:text-5xl mb-10">{selected.title}</h1>
-          <div className="text-sm font-light leading-[1.8] text-foreground/80 whitespace-pre-line">
+          <div className="text-sm leading-[1.8] text-muted-foreground whitespace-pre-line">
             {selected.body}
           </div>
         </div>
@@ -77,14 +77,13 @@ const ContentLibrary = () => {
       <div className="container mx-auto max-w-4xl">
         <h1 className="font-serif italic text-4xl md:text-5xl mb-12">The Library</h1>
 
-        {/* Filters */}
         <div className="flex gap-3 mb-14 flex-wrap">
           <button
             onClick={() => setFilter(null)}
-            className={`text-[12px] font-light tracking-[0.1em] uppercase px-5 py-[10px] border transition-colors rounded-[2px] ${
+            className={`text-[12px] font-medium tracking-[0.08em] uppercase px-5 py-[10px] border transition-colors rounded-lg ${
               filter === null
-                ? 'border-foreground bg-foreground text-primary-foreground'
-                : 'border-[rgba(242,237,228,0.2)] hover:border-[rgba(242,237,228,0.6)]'
+                ? 'border-primary bg-primary text-primary-foreground'
+                : 'border-border hover:border-foreground/30'
             }`}
           >
             All
@@ -93,10 +92,10 @@ const ContentLibrary = () => {
             <button
               key={p}
               onClick={() => setFilter(p)}
-              className={`text-[12px] font-light tracking-[0.1em] uppercase px-5 py-[10px] border transition-colors rounded-[2px] ${
+              className={`text-[12px] font-medium tracking-[0.08em] uppercase px-5 py-[10px] border transition-colors rounded-lg ${
                 filter === p
-                  ? 'border-foreground bg-foreground text-primary-foreground'
-                  : 'border-[rgba(242,237,228,0.2)] hover:border-[rgba(242,237,228,0.6)]'
+                  ? 'border-primary bg-primary text-primary-foreground'
+                  : 'border-border hover:border-foreground/30'
               }`}
             >
               {p}
@@ -104,7 +103,6 @@ const ContentLibrary = () => {
           ))}
         </div>
 
-        {/* Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filtered.map((item) => {
             const Icon = pillarIcons[item.pillar];
@@ -112,18 +110,18 @@ const ContentLibrary = () => {
               <button
                 key={item.id}
                 onClick={() => setSelected(item)}
-                className="bg-card border border-[rgba(242,237,228,0.08)] rounded-[4px] p-8 text-left transition-colors hover:border-[rgba(242,237,228,0.25)] group"
+                className="bg-card border border-border rounded-lg p-8 text-left transition-colors hover:border-foreground/25 group"
               >
                 <div className="flex items-center gap-2 mb-5">
-                  <Icon className="h-4 w-4 opacity-40" strokeWidth={1} />
-                  <span className="text-[10px] font-light tracking-[0.12em] uppercase text-muted-foreground">
+                  <Icon className="h-4 w-4 text-muted-foreground" strokeWidth={1} />
+                  <span className="text-[10px] font-medium tracking-[0.08em] uppercase text-muted-foreground">
                     {item.pillar}
                   </span>
                 </div>
                 <h2 className="font-serif italic text-lg mb-3 group-hover:opacity-80 transition-opacity">
                   {item.title}
                 </h2>
-                <p className="text-sm text-muted-foreground font-light leading-[1.7]">
+                <p className="text-sm text-muted-foreground leading-[1.7]">
                   {item.description}
                 </p>
               </button>

@@ -15,7 +15,6 @@ const Auth = () => {
 
   useEffect(() => {
     if (!user) return;
-    // Check if user has completed onboarding
     supabase
       .from('user_profiles')
       .select('onboarding_completed')
@@ -52,7 +51,7 @@ const Auth = () => {
   };
 
   const inputClass =
-    'w-full border border-[rgba(242,237,228,0.2)] bg-transparent px-4 py-3 text-sm font-light text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[rgba(242,237,228,0.6)] rounded-[2px]';
+    'w-full border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-foreground/30 rounded-lg';
 
   return (
     <div className="flex min-h-screen items-center justify-center px-6 pt-14">
@@ -78,19 +77,19 @@ const Auth = () => {
             required
             minLength={6}
           />
-          {error && <p className="text-sm font-light text-destructive">{error}</p>}
-          {message && <p className="text-sm font-light text-muted-foreground">{message}</p>}
+          {error && <p className="text-sm text-destructive">{error}</p>}
+          {message && <p className="text-sm text-muted-foreground">{message}</p>}
           <button
             type="submit"
             disabled={loading}
-            className="border border-foreground/80 bg-transparent px-8 py-[14px] text-[13px] font-light tracking-[0.1em] uppercase transition-colors hover:bg-foreground hover:text-primary-foreground disabled:opacity-40 rounded-[2px]"
+            className="bg-primary text-primary-foreground px-8 py-[14px] text-[13px] font-medium tracking-[0.08em] uppercase transition-colors hover:bg-foreground/90 disabled:opacity-40 rounded-lg"
           >
             {loading ? '...' : isSignUp ? 'Sign up' : 'Sign in'}
           </button>
         </form>
         <button
           onClick={() => { setIsSignUp(!isSignUp); setError(''); setMessage(''); }}
-          className="mt-8 block w-full text-center text-[12px] font-light text-muted-foreground tracking-[0.1em] uppercase hover:text-foreground transition-colors"
+          className="mt-8 block w-full text-center text-[12px] font-medium text-muted-foreground tracking-[0.08em] uppercase hover:text-foreground transition-colors"
         >
           {isSignUp ? 'Already have an account? Sign in' : 'Need an account? Sign up'}
         </button>
