@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;1,400&family=Outfit:wght@200;300;400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,700;1,400&family=Outfit:wght@300;400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,44 +6,46 @@
 
 @layer base {
   :root {
-    --background: 224 65% 12%;
-    --foreground: 36 8% 90%;
+    --background: 37 33% 93%;
+    --foreground: 60 4% 11%;
 
-    --card: 60 5% 8%;
-    --card-foreground: 36 8% 90%;
+    --card: 37 22% 89%;
+    --card-foreground: 60 4% 11%;
 
-    --popover: 60 5% 8%;
-    --popover-foreground: 36 8% 90%;
+    --popover: 37 22% 89%;
+    --popover-foreground: 60 4% 11%;
 
-    --primary: 36 8% 90%;
-    --primary-foreground: 224 65% 12%;
+    --primary: 60 4% 11%;
+    --primary-foreground: 37 33% 93%;
 
-    --secondary: 224 40% 18%;
-    --secondary-foreground: 36 8% 90%;
+    --secondary: 37 22% 89%;
+    --secondary-foreground: 60 4% 11%;
 
-    --muted: 224 20% 20%;
-    --muted-foreground: 30 5% 53%;
+    --muted: 37 14% 85%;
+    --muted-foreground: 40 5% 40%;
 
-    --accent: 36 30% 94%;
-    --accent-foreground: 224 65% 12%;
+    --accent: 138 16% 25%;
+    --accent-foreground: 37 33% 93%;
 
-    --destructive: 0 62% 50%;
-    --destructive-foreground: 36 8% 90%;
+    --accent-light: 120 13% 55%;
 
-    --border: 36 30% 94% / 0.1;
-    --input: 36 30% 94% / 0.2;
-    --ring: 36 8% 90%;
+    --destructive: 8 65% 45%;
+    --destructive-foreground: 37 33% 93%;
 
-    --radius: 2px;
+    --border: 37 14% 81%;
+    --input: 37 14% 81%;
+    --ring: 60 4% 11%;
 
-    --sidebar-background: 224 65% 10%;
-    --sidebar-foreground: 36 8% 90%;
-    --sidebar-primary: 36 8% 90%;
-    --sidebar-primary-foreground: 224 65% 12%;
-    --sidebar-accent: 224 40% 18%;
-    --sidebar-accent-foreground: 36 8% 90%;
-    --sidebar-border: 36 30% 94% / 0.08;
-    --sidebar-ring: 36 8% 90%;
+    --radius: 12px;
+
+    --sidebar-background: 37 33% 91%;
+    --sidebar-foreground: 60 4% 11%;
+    --sidebar-primary: 60 4% 11%;
+    --sidebar-primary-foreground: 37 33% 93%;
+    --sidebar-accent: 37 22% 89%;
+    --sidebar-accent-foreground: 60 4% 11%;
+    --sidebar-border: 37 14% 81%;
+    --sidebar-ring: 60 4% 11%;
   }
 }
 
@@ -55,21 +57,25 @@
   body {
     @apply bg-background text-foreground;
     font-family: 'Outfit', sans-serif;
-    font-weight: 300;
+    font-weight: 400;
     line-height: 1.8;
   }
 
   h1, h2 {
     font-family: 'Bodoni Moda', serif;
-    font-style: italic;
-    font-weight: 400;
+    font-weight: 700;
     letter-spacing: -0.01em;
+  }
+
+  h1.italic-display, .italic-display {
+    font-weight: 400;
+    font-style: italic;
   }
 
   h3, h4 {
     font-family: 'Outfit', sans-serif;
-    font-weight: 300;
-    letter-spacing: 0.12em;
+    font-weight: 500;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
   }
 }

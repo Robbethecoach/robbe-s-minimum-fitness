@@ -6,17 +6,14 @@ import { Play } from 'lucide-react';
 const MovementLibrary = () => {
   return (
     <section>
-      <div className="w-full h-px bg-[rgba(242,237,228,0.08)] mb-12" />
+      <div className="w-full h-px bg-border mb-12" />
       <h2 className="font-serif italic text-2xl md:text-3xl mb-10">Movement Library</h2>
-
       <MobilityFlows />
       <div className="mb-12" />
       <AccessoryDrills />
     </section>
   );
 };
-
-// ── Mobility Flows ────────────────────────────────────
 
 const MobilityFlows = () => {
   const [activeTag, setActiveTag] = useState<string | null>(null);
@@ -35,8 +32,7 @@ const MobilityFlows = () => {
 
   return (
     <div>
-      <h3 className="text-[12px] tracking-[0.12em] uppercase font-light mb-5">Mobility Flows</h3>
-
+      <h3 className="text-[12px] tracking-[0.08em] uppercase font-medium mb-5">Mobility Flows</h3>
       {tags.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-6">
           <FilterPill active={!activeTag} onClick={() => setActiveTag(null)}>All</FilterPill>
@@ -47,11 +43,9 @@ const MobilityFlows = () => {
           ))}
         </div>
       )}
-
       {(!filtered || filtered.length === 0) && (
-        <p className="text-sm text-muted-foreground font-light">No mobility flows added yet.</p>
+        <p className="text-sm text-muted-foreground">No mobility flows added yet.</p>
       )}
-
       <div className="grid gap-3 sm:grid-cols-2">
         {filtered?.map((flow) => (
           <LibraryCard
@@ -67,8 +61,6 @@ const MobilityFlows = () => {
     </div>
   );
 };
-
-// ── Accessory Drills ──────────────────────────────────
 
 const AccessoryDrills = () => {
   const [activeTag, setActiveTag] = useState<string | null>(null);
@@ -87,8 +79,7 @@ const AccessoryDrills = () => {
 
   return (
     <div>
-      <h3 className="text-[12px] tracking-[0.12em] uppercase font-light mb-5">Accessory Drills</h3>
-
+      <h3 className="text-[12px] tracking-[0.08em] uppercase font-medium mb-5">Accessory Drills</h3>
       {tags.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-6">
           <FilterPill active={!activeTag} onClick={() => setActiveTag(null)}>All</FilterPill>
@@ -99,11 +90,9 @@ const AccessoryDrills = () => {
           ))}
         </div>
       )}
-
       {(!filtered || filtered.length === 0) && (
-        <p className="text-sm text-muted-foreground font-light">No accessory drills added yet.</p>
+        <p className="text-sm text-muted-foreground">No accessory drills added yet.</p>
       )}
-
       <div className="grid gap-3 sm:grid-cols-2">
         {filtered?.map((drill) => (
           <LibraryCard
@@ -119,15 +108,13 @@ const AccessoryDrills = () => {
   );
 };
 
-// ── Shared Components ─────────────────────────────────
-
 const FilterPill = ({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) => (
   <button
     onClick={onClick}
-    className={`px-3 py-1.5 text-[11px] tracking-[0.08em] uppercase font-light border rounded-[2px] transition-all ${
+    className={`px-3 py-1.5 text-[11px] tracking-[0.08em] uppercase font-medium border rounded-md transition-all ${
       active
-        ? 'border-foreground/30 bg-foreground/5 text-foreground'
-        : 'border-foreground/10 text-muted-foreground hover:border-foreground/20'
+        ? 'border-accent bg-accent/10 text-accent'
+        : 'border-border text-muted-foreground hover:border-foreground/30'
     }`}
   >
     {children}
@@ -151,27 +138,27 @@ const LibraryCard = ({
   const youtubeId = youtubeUrl?.match(/(?:youtu\.be\/|v=)([^&\s]+)/)?.[1];
 
   return (
-    <div className="border border-foreground/8 rounded-[2px] p-4">
+    <div className="border border-border bg-card rounded-lg p-5">
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1">
-          <p className="text-sm font-light">{title}</p>
+          <p className="text-sm">{title}</p>
           <div className="flex items-center gap-2 mt-1">
-            <span className="text-[10px] tracking-[0.08em] uppercase text-muted-foreground">{tag}</span>
+            <span className="text-[10px] tracking-[0.08em] uppercase font-medium text-accent-light">{tag}</span>
             {meta && (
               <>
                 <span className="text-muted-foreground/30">·</span>
-                <span className="text-[10px] text-muted-foreground font-light">{meta}</span>
+                <span className="text-[10px] text-muted-foreground">{meta}</span>
               </>
             )}
           </div>
           {description && (
-            <p className="text-[12px] text-muted-foreground/70 font-light mt-2 italic">{description}</p>
+            <p className="text-[12px] text-muted-foreground mt-2 italic">{description}</p>
           )}
         </div>
         {youtubeId && (
           <button
             onClick={() => setVideoOpen(!videoOpen)}
-            className="p-1.5 border border-foreground/10 rounded-[2px] hover:border-foreground/25 transition-colors"
+            className="p-1.5 border border-border rounded-md hover:border-foreground/30 transition-colors"
           >
             <Play className="h-3 w-3 text-muted-foreground" strokeWidth={1.5} />
           </button>
@@ -181,7 +168,7 @@ const LibraryCard = ({
         <div className="mt-3 aspect-video">
           <iframe
             src={`https://www.youtube.com/embed/${youtubeId}`}
-            className="w-full h-full rounded-[2px]"
+            className="w-full h-full rounded-md"
             allowFullScreen
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           />
