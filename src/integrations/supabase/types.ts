@@ -170,6 +170,7 @@ export type Database = {
           alternative_youtube_url: string | null
           coaching_note: string | null
           created_at: string
+          focus: string
           id: string
           name: string
           order_index: number
@@ -185,6 +186,7 @@ export type Database = {
           alternative_youtube_url?: string | null
           coaching_note?: string | null
           created_at?: string
+          focus?: string
           id?: string
           name: string
           order_index?: number
@@ -200,6 +202,7 @@ export type Database = {
           alternative_youtube_url?: string | null
           coaching_note?: string | null
           created_at?: string
+          focus?: string
           id?: string
           name?: string
           order_index?: number
@@ -296,6 +299,10 @@ export type Database = {
           created_at: string
           equipment_access: string
           experience_level: string
+          focus_conditioning: number
+          focus_mobility: number
+          focus_strength: number
+          goal: string | null
           id: string
           onboarding_completed: boolean
           preferred_days: string[]
@@ -307,6 +314,10 @@ export type Database = {
           created_at?: string
           equipment_access?: string
           experience_level?: string
+          focus_conditioning?: number
+          focus_mobility?: number
+          focus_strength?: number
+          goal?: string | null
           id?: string
           onboarding_completed?: boolean
           preferred_days?: string[]
@@ -318,6 +329,10 @@ export type Database = {
           created_at?: string
           equipment_access?: string
           experience_level?: string
+          focus_conditioning?: number
+          focus_mobility?: number
+          focus_strength?: number
+          goal?: string | null
           id?: string
           onboarding_completed?: boolean
           preferred_days?: string[]
@@ -332,6 +347,7 @@ export type Database = {
           completed_at: string
           day_date: string
           id: string
+          rating: string | null
           user_id: string
           week_number: number
           workout_block_id: string
@@ -340,6 +356,7 @@ export type Database = {
           completed_at?: string
           day_date: string
           id?: string
+          rating?: string | null
           user_id: string
           week_number: number
           workout_block_id: string
@@ -348,6 +365,7 @@ export type Database = {
           completed_at?: string
           day_date?: string
           id?: string
+          rating?: string | null
           user_id?: string
           week_number?: number
           workout_block_id?: string
@@ -419,15 +437,319 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      member_plans: {
+        Row: {
+          block_number: number
+          block_start_date: string
+          created_at: string
+          deload_week: number
+          id: string
+          season_number: number
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          block_number?: number
+          block_start_date?: string
+          created_at?: string
+          deload_week?: number
+          id?: string
+          season_number?: number
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          block_number?: number
+          block_start_date?: string
+          created_at?: string
+          deload_week?: number
+          id?: string
+          season_number?: number
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      member_exercise_overrides: {
+        Row: {
+          exercise_id: string
+          id: string
+          paused: boolean
+          reps: string | null
+          sets: number | null
+          source: string
+          target_load_kg: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          exercise_id: string
+          id?: string
+          paused?: boolean
+          reps?: string | null
+          sets?: number | null
+          source?: string
+          target_load_kg?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          exercise_id?: string
+          id?: string
+          paused?: boolean
+          reps?: string | null
+          sets?: number | null
+          source?: string
+          target_load_kg?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      exercise_logs: {
+        Row: {
+          completion_id: string
+          exercise_id: string
+          id: string
+          logged_at: string
+          user_id: string
+          weight_kg: number
+        }
+        Insert: {
+          completion_id: string
+          exercise_id: string
+          id?: string
+          logged_at?: string
+          user_id: string
+          weight_kg: number
+        }
+        Update: {
+          completion_id?: string
+          exercise_id?: string
+          id?: string
+          logged_at?: string
+          user_id?: string
+          weight_kg?: number
+        }
+        Relationships: []
+      }
+      method_rules: {
+        Row: {
+          action: Json
+          active: boolean
+          condition: Json
+          created_at: string
+          description: string
+          id: string
+          name: string
+          priority: number
+          step: string
+          updated_at: string
+        }
+        Insert: {
+          action?: Json
+          active?: boolean
+          condition?: Json
+          created_at?: string
+          description: string
+          id?: string
+          name: string
+          priority?: number
+          step: string
+          updated_at?: string
+        }
+        Update: {
+          action?: Json
+          active?: boolean
+          condition?: Json
+          created_at?: string
+          description?: string
+          id?: string
+          name?: string
+          priority?: number
+          step?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      suggestions: {
+        Row: {
+          created_at: string
+          decided_at: string | null
+          exercise_id: string | null
+          id: string
+          payload: Json
+          reason: string
+          rule_id: string | null
+          source: string
+          status: string
+          type: string
+          user_id: string
+          week_start: string
+        }
+        Insert: {
+          created_at?: string
+          decided_at?: string | null
+          exercise_id?: string | null
+          id?: string
+          payload?: Json
+          reason: string
+          rule_id?: string | null
+          source?: string
+          status?: string
+          type: string
+          user_id: string
+          week_start: string
+        }
+        Update: {
+          created_at?: string
+          decided_at?: string | null
+          exercise_id?: string | null
+          id?: string
+          payload?: Json
+          reason?: string
+          rule_id?: string | null
+          source?: string
+          status?: string
+          type?: string
+          user_id?: string
+          week_start?: string
+        }
+        Relationships: []
+      }
+      escalation_flags: {
+        Row: {
+          category: string
+          created_at: string
+          detail: string | null
+          id: string
+          refer_to: string | null
+          resolved_at: string | null
+          source: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          detail?: string | null
+          id?: string
+          refer_to?: string | null
+          resolved_at?: string | null
+          source: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          detail?: string | null
+          id?: string
+          refer_to?: string | null
+          resolved_at?: string | null
+          source?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      robbe_questions: {
+        Row: {
+          context: string | null
+          created_at: string
+          id: string
+          question: string
+          source: string
+          status: string
+          step: string
+        }
+        Insert: {
+          context?: string | null
+          created_at?: string
+          id?: string
+          question: string
+          source?: string
+          status?: string
+          step: string
+        }
+        Update: {
+          context?: string | null
+          created_at?: string
+          id?: string
+          question?: string
+          source?: string
+          status?: string
+          step?: string
+        }
+        Relationships: []
+      }
+      robbe_answers: {
+        Row: {
+          answer: string
+          created_at: string
+          id: string
+          question_id: string
+          rule_id: string | null
+        }
+        Insert: {
+          answer: string
+          created_at?: string
+          id?: string
+          question_id: string
+          rule_id?: string | null
+        }
+        Update: {
+          answer?: string
+          created_at?: string
+          id?: string
+          question_id?: string
+          rule_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      decide_suggestion: {
+        Args: { _decision: string; _suggestion_id: string }
+        Returns: undefined
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -554,6 +876,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin"],
+    },
   },
 } as const

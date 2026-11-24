@@ -5,8 +5,23 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Check, Play, RefreshCw } from 'lucide-react';
-import { format, startOfWeek, addDays, differenceInWeeks } from 'date-fns';
+import { format, startOfWeek, addDays } from 'date-fns';
 import MovementLibrary from '@/components/move/MovementLibrary';
+import {
+  type ExerciseOverride,
+  type FocusProfile,
+  type SessionRating,
+  orderOptionalSessions,
+  orderRequiredSessions,
+  prescribe,
+  weekInBlock,
+} from '@/lib/prescription';
+
+const RATINGS: { value: SessionRating; label: string }[] = [
+  { value: 'too_easy', label: 'Too easy' },
+  { value: 'right', label: 'Right' },
+  { value: 'too_hard', label: 'Too hard' },
+];
 
 const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
@@ -39,6 +54,11 @@ interface Exercise {
   alternative_name: string | null;
   alternative_youtube_url: string | null;
   alternative_coaching_note: string | null;
+  focus: string;
+}
+
+interface Override extends ExerciseOverride {
+  exercise_id: string;
 }
 
 const Move = () => {
@@ -47,12 +67,28 @@ const Move = () => {
   const queryClient = useQueryClient();
   const [selectedWorkout, setSelectedWorkout] = useState<{ block: WorkoutBlock; dayLabel: string } | null>(null);
 
-  const currentWeekNumber = useMemo(() => {
-    if (!profile?.training_start_date) return 1;
-    const start = new Date(profile.training_start_date);
-    const weeksSinceStart = differenceInWeeks(new Date(), start);
-    return ((weeksSinceStart % 4) + 1);
-  }, [profile?.training_start_date]);
+  const { data: plan } = useQuery({
+    queryKey: ['member_plan', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('member_plans')
+        .select('*')
+        .eq('user_id', user!.id)
+        .eq('status', 'active')
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  // The active plan's block start drives the week; older profiles fall back to their start date.
+  const blockStart = plan?.block_start_date ?? profile?.training_start_date;
+  const deloadWeek = plan?.deload_week ?? 4;
+  const currentWeekNumber = useMemo(
+    () => (blockStart ? weekInBlock(new Date(blockStart), new Date()) : 1),
+    [blockStart],
+  );
 
   const { data: workoutBlocks } = useQuery({
     queryKey: ['workout_blocks', currentWeekNumber],
@@ -88,9 +124,16 @@ const Move = () => {
 
   const weekSchedule = useMemo(() => {
     if (!workoutBlocks || !profile?.preferred_days) return [];
-    const preferredDays = profile.preferred_days as string[];
-    const required = workoutBlocks.filter((b) => !['recovery_run', 'mobility_flow'].includes(b.day_type));
-    const optional = workoutBlocks.filter((b) => ['recovery_run', 'mobility_flow'].includes(b.day_type));
+    // Week order, whatever order the days were picked in.
+    const preferredDays = [...(profile.preferred_days as string[])].sort(
+      (a, b) => DAY_LABELS.indexOf(a) - DAY_LABELS.indexOf(b),
+    );
+    const byType = (types: string[]) =>
+      types
+        .map((type) => workoutBlocks.find((b) => b.day_type === type))
+        .filter((b): b is WorkoutBlock => !!b);
+    const required = byType(orderRequiredSessions(profile, preferredDays.length));
+    const optional = byType(orderOptionalSessions(profile));
     const assigned: { day: string; dayIndex: number; date: string; workout: WorkoutBlock | null; isOptional: boolean }[] = [];
     DAY_LABELS.forEach((day, i) => {
       const date = format(addDays(weekStart, i), 'yyyy-MM-dd');
@@ -114,7 +157,7 @@ const Move = () => {
       }
     }
     return assigned;
-  }, [workoutBlocks, profile?.preferred_days, weekStart]);
+  }, [workoutBlocks, profile, weekStart]);
 
   const isCompleted = (blockId: string, date: string) =>
     completions?.some((c) => c.workout_block_id === blockId && c.day_date === date);
@@ -129,6 +172,8 @@ const Move = () => {
         onBack={() => setSelectedWorkout(null)}
         userId={user!.id}
         weekNumber={currentWeekNumber}
+        deloadWeek={deloadWeek}
+        profile={profile!}
         queryClient={queryClient}
       />
     );
@@ -144,7 +189,7 @@ const Move = () => {
           </Link>
           <h1 className="font-serif italic text-4xl md:text-5xl">Move</h1>
           <p className="mt-3 text-sm text-muted-foreground">
-            Week {currentWeekNumber} of 4
+            Week {currentWeekNumber} of 4{currentWeekNumber === deloadWeek ? ' · Deload week' : ''}
           </p>
         </div>
 
@@ -220,10 +265,18 @@ interface WorkoutDetailProps {
   onBack: () => void;
   userId: string;
   weekNumber: number;
+  deloadWeek: number;
+  profile: FocusProfile;
   queryClient: ReturnType<typeof useQueryClient>;
 }
 
-const WorkoutDetail = ({ block, dayLabel, date, completed, onBack, userId, weekNumber, queryClient }: WorkoutDetailProps) => {
+const WorkoutDetail = ({
+  block, dayLabel, date, completed, onBack, userId, weekNumber, deloadWeek, profile, queryClient,
+}: WorkoutDetailProps) => {
+  const [weights, setWeights] = useState<Record<string, string>>({});
+  const [rating, setRating] = useState<SessionRating | null>(null);
+  const [formError, setFormError] = useState('');
+
   const { data: exercises } = useQuery({
     queryKey: ['exercises', block.id],
     queryFn: async () => {
@@ -237,21 +290,94 @@ const WorkoutDetail = ({ block, dayLabel, date, completed, onBack, userId, weekN
     },
   });
 
-  const completeMutation = useMutation({
-    mutationFn: async () => {
-      const { error } = await supabase.from('user_workout_completions').insert({
-        user_id: userId,
-        workout_block_id: block.id,
-        week_number: weekNumber,
-        day_date: date,
-      });
+  const exerciseIds = exercises?.map((e) => e.id) ?? [];
+
+  const { data: overrides } = useQuery({
+    queryKey: ['exercise_overrides', userId, block.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('member_exercise_overrides')
+        .select('exercise_id, sets, reps, target_load_kg, paused')
+        .eq('user_id', userId)
+        .in('exercise_id', exerciseIds);
       if (error) throw error;
+      return data as Override[];
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['completions'] }),
+    enabled: exerciseIds.length > 0,
   });
 
-  const mainLifts = exercises?.filter((e) => e.type === 'main_lift') || [];
-  const accessories = exercises?.filter((e) => e.type === 'accessory') || [];
+  // Last logged weight per exercise, shown as a starting point.
+  const { data: lastWeights } = useQuery({
+    queryKey: ['last_weights', userId, block.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('exercise_logs')
+        .select('exercise_id, weight_kg, logged_at')
+        .eq('user_id', userId)
+        .in('exercise_id', exerciseIds)
+        .order('logged_at', { ascending: false });
+      if (error) throw error;
+      const latest: Record<string, number> = {};
+      for (const row of data) if (!(row.exercise_id in latest)) latest[row.exercise_id] = Number(row.weight_kg);
+      return latest;
+    },
+    enabled: exerciseIds.length > 0,
+  });
+
+  const prescriptionFor = (ex: Exercise) =>
+    prescribe(ex, profile, {
+      weekInBlock: weekNumber,
+      deloadWeek,
+      override: overrides?.find((o) => o.exercise_id === ex.id) ?? null,
+    });
+
+  const completeMutation = useMutation({
+    mutationFn: async () => {
+      const { data: completion, error } = await supabase
+        .from('user_workout_completions')
+        .insert({
+          user_id: userId,
+          workout_block_id: block.id,
+          week_number: weekNumber,
+          day_date: date,
+          rating,
+        })
+        .select('id')
+        .single();
+      if (error) throw error;
+
+      const logs = Object.entries(weights)
+        .map(([exercise_id, value]) => ({ exercise_id, weight_kg: Number(value.replace(',', '.')) }))
+        .filter((l) => l.weight_kg > 0)
+        .map((l) => ({ ...l, user_id: userId, completion_id: completion.id }));
+      if (logs.length > 0) {
+        const { error: logError } = await supabase.from('exercise_logs').insert(logs);
+        if (logError) throw logError;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['completions'] });
+      queryClient.invalidateQueries({ queryKey: ['last_weights'] });
+    },
+    onError: (e: Error) => setFormError(e.message),
+  });
+
+  const handleComplete = () => {
+    if (!rating) {
+      setFormError('How did this session feel?');
+      return;
+    }
+    const invalid = Object.values(weights).some((v) => v.trim() !== '' && !(Number(v.replace(',', '.')) >= 0));
+    if (invalid) {
+      setFormError('Enter weights as numbers, e.g. 62.5');
+      return;
+    }
+    setFormError('');
+    completeMutation.mutate();
+  };
+
+  const mainLifts = exercises?.filter((e) => e.type === 'main_lift' && !prescriptionFor(e).paused) || [];
+  const accessories = exercises?.filter((e) => e.type === 'accessory' && !prescriptionFor(e).paused) || [];
   const meta = DAY_TYPE_META[block.day_type];
 
   return (
@@ -270,6 +396,9 @@ const WorkoutDetail = ({ block, dayLabel, date, completed, onBack, userId, weekN
             {dayLabel} — {meta?.label}
           </span>
           <h1 className="font-serif italic text-3xl md:text-4xl">{block.workout_name}</h1>
+          {weekNumber === deloadWeek && (
+            <p className="mt-2 text-sm text-muted-foreground">Deload week: fewer sets, same quality.</p>
+          )}
         </div>
 
         {mainLifts.length > 0 && (
@@ -277,7 +406,17 @@ const WorkoutDetail = ({ block, dayLabel, date, completed, onBack, userId, weekN
             <h3 className="text-[12px] tracking-[0.08em] uppercase font-medium mb-5">Main Lifts</h3>
             <div className="space-y-4">
               {mainLifts.map((ex) => (
-                <ExerciseCard key={ex.id} exercise={ex} showAlternative />
+                <ExerciseCard
+                  key={ex.id}
+                  exercise={ex}
+                  prescription={prescriptionFor(ex)}
+                  showAlternative
+                  weight={completed ? undefined : {
+                    value: weights[ex.id] ?? '',
+                    last: lastWeights?.[ex.id],
+                    onChange: (value) => setWeights((prev) => ({ ...prev, [ex.id]: value })),
+                  }}
+                />
               ))}
             </div>
           </section>
@@ -288,20 +427,41 @@ const WorkoutDetail = ({ block, dayLabel, date, completed, onBack, userId, weekN
             <h3 className="text-[12px] tracking-[0.08em] uppercase font-medium mb-5">Accessory Drills</h3>
             <div className="space-y-3">
               {accessories.map((ex) => (
-                <ExerciseCard key={ex.id} exercise={ex} compact />
+                <ExerciseCard key={ex.id} exercise={ex} prescription={prescriptionFor(ex)} compact />
               ))}
             </div>
           </section>
         )}
 
         {!completed ? (
+          <>
+          <section className="mb-6">
+            <h3 className="text-[12px] tracking-[0.08em] uppercase font-medium mb-4">How did it feel?</h3>
+            <div className="grid grid-cols-3 gap-2">
+              {RATINGS.map((r) => (
+                <button
+                  key={r.value}
+                  onClick={() => setRating(r.value)}
+                  className={`border px-3 py-3 text-[12px] tracking-[0.08em] uppercase font-medium rounded-lg transition-all ${
+                    rating === r.value
+                      ? 'border-accent bg-accent text-accent-foreground'
+                      : 'border-border text-muted-foreground hover:border-foreground/30'
+                  }`}
+                >
+                  {r.label}
+                </button>
+              ))}
+            </div>
+          </section>
+          {formError && <p className="text-sm text-destructive mb-4">{formError}</p>}
           <button
-            onClick={() => completeMutation.mutate()}
+            onClick={handleComplete}
             disabled={completeMutation.isPending}
             className="w-full bg-primary text-primary-foreground px-8 py-[14px] text-[13px] font-medium tracking-[0.08em] uppercase transition-colors hover:bg-foreground/90 disabled:opacity-40 rounded-lg"
           >
             {completeMutation.isPending ? '...' : 'Complete workout'}
           </button>
+          </>
         ) : (
           <div className="flex items-center justify-center gap-2 py-4 text-accent">
             <Check className="h-4 w-4" strokeWidth={1.5} />
@@ -317,11 +477,13 @@ const WorkoutDetail = ({ block, dayLabel, date, completed, onBack, userId, weekN
 
 interface ExerciseCardProps {
   exercise: Exercise;
+  prescription: { sets: number; reps: string; targetLoadKg: number | null };
   showAlternative?: boolean;
   compact?: boolean;
+  weight?: { value: string; last?: number; onChange: (value: string) => void };
 }
 
-const ExerciseCard = ({ exercise, showAlternative, compact }: ExerciseCardProps) => {
+const ExerciseCard = ({ exercise, prescription, showAlternative, compact, weight }: ExerciseCardProps) => {
   const [showAlt, setShowAlt] = useState(false);
   const [videoExpanded, setVideoExpanded] = useState(false);
 
@@ -345,7 +507,8 @@ const ExerciseCard = ({ exercise, showAlternative, compact }: ExerciseCardProps)
         <div className="flex-1">
           <p className={`${compact ? 'text-sm' : 'text-base'}`}>{active.name}</p>
           <p className="text-[12px] text-muted-foreground mt-1">
-            {exercise.sets} × {exercise.reps}
+            {prescription.sets} × {prescription.reps}
+            {prescription.targetLoadKg != null && ` · target ${prescription.targetLoadKg} kg`}
           </p>
           {active.note && (
             <p className="text-[12px] text-muted-foreground/70 mt-1 italic">
@@ -376,6 +539,26 @@ const ExerciseCard = ({ exercise, showAlternative, compact }: ExerciseCardProps)
           )}
         </div>
       </div>
+
+      {weight && (
+        <div className="mt-4 flex items-center gap-3">
+          <label className="text-[11px] tracking-[0.08em] uppercase text-muted-foreground" htmlFor={`w-${exercise.id}`}>
+            Weight used
+          </label>
+          <input
+            id={`w-${exercise.id}`}
+            inputMode="decimal"
+            value={weight.value}
+            onChange={(e) => weight.onChange(e.target.value)}
+            placeholder={weight.last != null ? String(weight.last) : 'kg'}
+            className="w-24 bg-transparent border border-border rounded-md px-3 py-1.5 text-sm focus:outline-none focus:border-foreground/30"
+          />
+          <span className="text-[12px] text-muted-foreground">kg</span>
+          {weight.last != null && (
+            <span className="text-[11px] text-muted-foreground/70">last: {weight.last} kg</span>
+          )}
+        </div>
+      )}
 
       {videoExpanded && youtubeId && (
         <div className="mt-4 aspect-video">
