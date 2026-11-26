@@ -1,50 +1,46 @@
 import { describe, expect, it } from 'vitest';
-import { orderOptionalSessions, orderRequiredSessions, prescribe, weekInBlock } from './prescription';
+import { prescribe, weekInBlock } from './prescription';
 
-const medium = { focus_strength: 2, focus_conditioning: 2, focus_mobility: 2 };
-const strengthHigh = { focus_strength: 3, focus_conditioning: 1, focus_mobility: 2 };
+const balanced = { focus_strength: 3, focus_conditioning: 3, focus_mobility: 3 };
+const strengthHigh = { focus_strength: 5, focus_conditioning: 2, focus_mobility: 3 };
+const main = { sets: 3, reps: '6-8', focus: 'strength', is_main_lift: true };
 
 describe('prescribe', () => {
-  it('keeps the template at medium focus', () => {
-    expect(prescribe({ sets: 3, reps: '8', focus: 'strength' }, medium, { weekInBlock: 1, deloadWeek: 4 }))
-      .toMatchObject({ sets: 3, reps: '8', isDeload: false });
+  it('keeps the template at a middle score, with week 1 at RIR 3', () => {
+    expect(prescribe(main, balanced, { weekInBlock: 1, deloadWeek: 4 }))
+      .toMatchObject({ sets: 3, reps: '6-8', rir: 3, isDeload: false });
   });
 
-  it('adds a set for high focus and removes one for low focus', () => {
-    expect(prescribe({ sets: 3, reps: '8', focus: 'strength' }, strengthHigh, { weekInBlock: 1, deloadWeek: 4 }).sets).toBe(4);
-    expect(prescribe({ sets: 3, reps: '8', focus: 'conditioning' }, strengthHigh, { weekInBlock: 1, deloadWeek: 4 }).sets).toBe(2);
+  it('adds a set for a high score and removes one for a low score', () => {
+    expect(prescribe(main, strengthHigh, { weekInBlock: 1, deloadWeek: 4 }).sets).toBe(4);
+    expect(prescribe({ sets: 3, reps: '20 min', focus: 'conditioning' }, strengthHigh, { weekInBlock: 1, deloadWeek: 4 }).sets).toBe(2);
   });
 
-  it('cuts sets in the deload week, wherever it falls', () => {
-    const p = prescribe({ sets: 4, reps: '6', focus: 'strength' }, medium, { weekInBlock: 3, deloadWeek: 3 });
-    expect(p).toMatchObject({ sets: 2, isDeload: true });
+  it('never goes below 2 sets', () => {
+    const low = { focus_strength: 1, focus_conditioning: 1, focus_mobility: 1 };
+    expect(prescribe({ sets: 2, reps: '10', focus: 'mobility' }, low, { weekInBlock: 1, deloadWeek: 4 }).sets).toBe(2);
+    expect(prescribe({ sets: 2, reps: '10', focus: 'mobility' }, low, { weekInBlock: 4, deloadWeek: 4 }).sets).toBe(2);
+  });
+
+  it('follows the block: RIR 2 in week 2, an extra set at RIR 1–2 in week 3', () => {
+    expect(prescribe(main, balanced, { weekInBlock: 2, deloadWeek: 4 })).toMatchObject({ sets: 3, rir: 2 });
+    expect(prescribe(main, balanced, { weekInBlock: 3, deloadWeek: 4 })).toMatchObject({ sets: 4, rir: 1, rirLabel: 'RIR 1–2' });
+  });
+
+  it('halves the sets in the deload week, wherever it falls', () => {
+    expect(prescribe({ ...main, sets: 4 }, balanced, { weekInBlock: 3, deloadWeek: 3 })).toMatchObject({ sets: 2, rir: 4, isDeload: true });
+  });
+
+  it('gives accessories a lower RIR than main lifts', () => {
+    expect(prescribe({ sets: 3, reps: '10-12', focus: 'strength' }, balanced, { weekInBlock: 2, deloadWeek: 4 }).rir).toBe(1);
   });
 
   it('applies member overrides before the deload', () => {
-    const p = prescribe({ sets: 3, reps: '8' }, medium, {
+    const p = prescribe(main, balanced, {
       weekInBlock: 1, deloadWeek: 4,
       override: { sets: 5, reps: '5', target_load_kg: 82.5, paused: false },
     });
     expect(p).toMatchObject({ sets: 5, reps: '5', targetLoadKg: 82.5 });
-  });
-
-  it('never goes below one set', () => {
-    expect(prescribe({ sets: 1, reps: '8', focus: 'mobility' }, { ...medium, focus_mobility: 1 }, { weekInBlock: 4, deloadWeek: 4 }).sets).toBe(1);
-  });
-});
-
-describe('session order', () => {
-  it('gives 3-day members both sessions of their main focus', () => {
-    expect(orderRequiredSessions(strengthHigh, 3)).toEqual(['strength_a', 'conditioning_a', 'strength_b']);
-    expect(orderRequiredSessions({ ...medium, focus_conditioning: 3 }, 3)).toEqual(['conditioning_a', 'strength_a', 'conditioning_b']);
-  });
-
-  it('uses all four required sessions from 4 days', () => {
-    expect(orderRequiredSessions(medium, 6)).toHaveLength(4);
-  });
-
-  it('puts mobility first for high mobility focus', () => {
-    expect(orderOptionalSessions({ ...medium, focus_mobility: 3 })[0]).toBe('mobility_flow');
   });
 });
 
