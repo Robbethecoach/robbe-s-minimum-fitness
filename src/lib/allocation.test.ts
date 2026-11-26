@@ -5,6 +5,11 @@ const balanced = { strength: 3, mobility: 3, conditioning: 3 };
 const sorted = (s: SessionCode[]) => [...s].sort();
 
 describe('allocateSessions', () => {
+  it('balanced on 4 days: A, B, zone 2 and intervals; on 5 days a mobility day joins', () => {
+    expect(sorted(allocateSessions({ scores: balanced, days: 4 }))).toEqual(['A', 'B', 'E', 'F']);
+    expect(sorted(allocateSessions({ scores: balanced, days: 5 }))).toEqual(['A', 'B', 'C', 'E', 'F']);
+  });
+
   it('3 days: A, B and zone 2', () => {
     expect(sorted(allocateSessions({ scores: balanced, days: 3 }))).toEqual(['A', 'B', 'F']);
   });
@@ -45,7 +50,8 @@ describe('allocateSessions', () => {
   });
 
   it('distributes extra days in proportion to the scores', () => {
-    expect(distributeExtraDays({ strength: 4, mobility: 2, conditioning: 2 }, 3)).toEqual({ strength: 2, mobility: 0, conditioning: 1 });
+    expect(distributeExtraDays({ strength: 5, mobility: 2, conditioning: 2 }, 1)).toEqual({ strength: 1, mobility: 0, conditioning: 0 });
+    expect(distributeExtraDays({ strength: 3, mobility: 3, conditioning: 3 }, 2)).toEqual({ strength: 0, mobility: 1, conditioning: 1 });
   });
 });
 

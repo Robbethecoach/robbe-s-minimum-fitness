@@ -65,6 +65,14 @@ const clampScore = (n: number) => Math.min(5, Math.max(1, Math.round(n)));
 export const clampDays = (n: number) => Math.min(MAX_DAYS, Math.max(MIN_DAYS, Math.round(n)));
 
 type Quality = keyof FocusScores;
+/**
+ * PLACEHOLDER (Robbe to confirm): how much of the base week already "counts" for each quality
+ * when extra days are handed out. A and B are a floor for everyone, so strength counts for 1.5
+ * rather than 2: a strength-focused member still gets the extra day, a balanced member gets
+ * conditioning or mobility first.
+ */
+const BASE_SHARE: Record<Quality, number> = { strength: 1.5, conditioning: 1, mobility: 1 };
+
 /** Tie-break order when two qualities score the same. */
 const TIE_ORDER: Quality[] = ['strength', 'conditioning', 'mobility'];
 
@@ -80,8 +88,7 @@ export const distributeExtraDays = (scores: FocusScores, extraDays: number): Rec
     let best: Quality = TIE_ORDER[0];
     let bestValue = -1;
     for (const q of TIE_ORDER) {
-      // Base week already holds 2 strength sessions and 1 conditioning session.
-      const value = s[q] / (count[q] + 1);
+      const value = s[q] / (count[q] + BASE_SHARE[q]);
       if (value > bestValue) {
         bestValue = value;
         best = q;

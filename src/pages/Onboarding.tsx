@@ -1,25 +1,24 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { MAX_DAYS, MIN_DAYS } from '@/lib/prescription';
+import { MAX_DAYS, MIN_DAYS, SESSION_NAMES, planWeek } from '@/lib/allocation';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-const EXPERIENCE = ['Beginner', 'Intermediate', 'Advanced'];
-const EQUIPMENT = [
-  { value: 'gym', label: 'Yes — full gym' },
-  { value: 'home', label: 'Home setup' },
-  { value: 'minimal', label: 'Minimal equipment' },
-];
+// Level is measured from the weights logged in week 1, so there's no experience question.
 const FOCUS_AREAS = [
-  { key: 'focus_strength', label: 'Strength' },
-  { key: 'focus_conditioning', label: 'Conditioning' },
-  { key: 'focus_mobility', label: 'Mobility' },
+  { key: 'focus_strength', label: 'Strength', hint: 'lifting, getting stronger' },
+  { key: 'focus_mobility', label: 'Mobility', hint: 'range, joints, moving well' },
+  { key: 'focus_conditioning', label: 'Conditioning', hint: 'running, engine, endurance' },
 ] as const;
-const FOCUS_LEVELS = [
-  { value: 1, label: 'Low' },
-  { value: 2, label: 'Medium' },
-  { value: 3, label: 'High' },
+const FOCUS_SCORES = [1, 2, 3, 4, 5];
+const RUNNING_GOALS = [
+  { value: '', label: 'No goal' },
+  { value: '5k', label: '5 km' },
+  { value: '10k', label: '10 km' },
+  { value: 'half_marathon', label: 'Half marathon' },
+  { value: 'marathon', label: 'Marathon' },
+  { value: 'fitter', label: 'Fitter' },
 ];
 type FocusKey = (typeof FOCUS_AREAS)[number]['key'];
 
@@ -35,18 +34,31 @@ const Onboarding = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
-  const [experience, setExperience] = useState('');
-  const [equipment, setEquipment] = useState('');
+  const [hasGym, setHasGym] = useState(false);
+  const [runningGoal, setRunningGoal] = useState('');
   const [focus, setFocus] = useState<Record<FocusKey, number>>({
-    focus_strength: 2,
-    focus_conditioning: 2,
-    focus_mobility: 2,
+    focus_strength: 3,
+    focus_conditioning: 3,
+    focus_mobility: 3,
   });
   const [goal, setGoal] = useState('');
   const [redFlags, setRedFlags] = useState<string[]>([]);
   const [noRedFlags, setNoRedFlags] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const weekPreview = useMemo(() => {
+    if (selectedDays.length < MIN_DAYS || selectedDays.length > MAX_DAYS) return [];
+    return planWeek(
+      {
+        scores: { strength: focus.focus_strength, mobility: focus.focus_mobility, conditioning: focus.focus_conditioning },
+        days: selectedDays.length,
+        // The running plan only starts after the 30-minute test, so the preview shows the standard week.
+        canDoIntervals: false,
+      },
+      selectedDays,
+    );
+  }, [selectedDays, focus]);
 
   const toggleDay = (day: string) => {
     setSelectedDays((prev) =>
@@ -64,7 +76,7 @@ const Onboarding = () => {
       setError(`Select ${MIN_DAYS} to ${MAX_DAYS} training days.`);
       return;
     }
-    if (!experience || !equipment || (!noRedFlags && redFlags.length === 0)) {
+    if (!hasGym || (!noRedFlags && redFlags.length === 0)) {
       setError('Please answer all questions.');
       return;
     }
@@ -75,9 +87,9 @@ const Onboarding = () => {
       user_id: user!.id,
       // Stored in week order, so sessions are planned Monday → Sunday.
       preferred_days: [...selectedDays].sort((a, b) => DAYS.indexOf(a) - DAYS.indexOf(b)),
-      experience_level: experience.toLowerCase(),
-      equipment_access: equipment,
+      equipment_access: 'gym',
       ...focus,
+      conditioning_goal: runningGoal || null,
       goal: goal.trim() || null,
       onboarding_completed: true,
       training_start_date: new Date().toISOString().split('T')[0],
@@ -160,65 +172,84 @@ const Onboarding = () => {
           <p className="text-[11px] text-muted-foreground mt-2">Pick {MIN_DAYS}–{MAX_DAYS} days</p>
         </div>
 
-        {/* Experience */}
-        <div className="mb-10">
-          <p className="text-[12px] tracking-[0.08em] uppercase font-medium mb-4">
-            What is your training experience?
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {EXPERIENCE.map((level) => (
-              <button
-                key={level}
-                onClick={() => setExperience(level)}
-                className={pillClass(experience === level)}
-              >
-                {level}
-              </button>
-            ))}
-          </div>
-        </div>
-
         {/* Equipment */}
         <div className="mb-10">
           <p className="text-[12px] tracking-[0.08em] uppercase font-medium mb-4">
-            Do you have access to a gym with barbells?
+            Where do you train?
           </p>
-          <div className="flex flex-wrap gap-2">
-            {EQUIPMENT.map((opt) => (
-              <button
-                key={opt.value}
-                onClick={() => setEquipment(opt.value)}
-                className={pillClass(equipment === opt.value)}
-              >
-                {opt.label}
-              </button>
-            ))}
-          </div>
+          <button onClick={() => setHasGym((v) => !v)} className={pillClass(hasGym)}>
+            I have a gym with free weights
+          </button>
+          <p className="text-[11px] text-muted-foreground mt-2">The plan needs a functional gym; free weights are enough.</p>
         </div>
 
         {/* Focus */}
         <div className="mb-10">
-          <p className="text-[12px] tracking-[0.08em] uppercase font-medium mb-4">
-            How much focus on each?
+          <p className="text-[12px] tracking-[0.08em] uppercase font-medium mb-2">
+            How important is each one to you right now?
           </p>
-          <div className="space-y-3">
+          <p className="text-[12px] text-muted-foreground mb-4">
+            Everyone does the same sessions. How much time goes to each part depends on you.
+          </p>
+          <div className="space-y-4">
             {FOCUS_AREAS.map((area) => (
-              <div key={area.key} className="flex items-center justify-between gap-4">
-                <span className="text-sm">{area.label}</span>
-                <div className="flex gap-2">
-                  {FOCUS_LEVELS.map((level) => (
+              <div key={area.key}>
+                <div className="flex items-baseline justify-between mb-2">
+                  <span className="text-sm">{area.label}</span>
+                  <span className="text-[11px] text-muted-foreground">{area.hint}</span>
+                </div>
+                <div className="grid grid-cols-5 gap-2">
+                  {FOCUS_SCORES.map((score) => (
                     <button
-                      key={level.value}
-                      onClick={() => setFocus((prev) => ({ ...prev, [area.key]: level.value }))}
-                      className={pillClass(focus[area.key] === level.value)}
+                      key={score}
+                      aria-label={`${area.label} ${score} of 5`}
+                      onClick={() => setFocus((prev) => ({ ...prev, [area.key]: score }))}
+                      className={pillClass(focus[area.key] === score)}
                     >
-                      {level.label}
+                      {score}
                     </button>
                   ))}
                 </div>
               </div>
             ))}
           </div>
+
+          {weekPreview.length > 0 && (
+            <div className="mt-6 rounded-xl bg-primary text-primary-foreground p-5">
+              <p className="text-[11px] tracking-[0.12em] uppercase opacity-70 mb-3">Your week</p>
+              <div className="grid grid-cols-7 gap-1.5">
+                {weekPreview.map((d) => (
+                  <div key={d.day} className={`rounded-lg px-1 py-2 text-center ${d.session ? 'bg-accent' : 'opacity-40'}`}>
+                    <div className="text-[10px] uppercase tracking-[0.08em] opacity-80">{d.day}</div>
+                    <div className="font-serif text-lg leading-tight">{d.session ?? '·'}</div>
+                    <div className="text-[9px] opacity-80 leading-tight">{d.session ? SESSION_NAMES[d.session] : 'rest'}</div>
+                  </div>
+                ))}
+              </div>
+              <p className="text-[11px] opacity-70 mt-3">
+                A and B are always in. Mobility also runs as a block inside A and B. Intervals are added once you've done the 30-minute test.
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Running goal */}
+        <div className="mb-10">
+          <p className="text-[12px] tracking-[0.08em] uppercase font-medium mb-4">
+            Training for a run?
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {RUNNING_GOALS.map((g) => (
+              <button key={g.value || 'none'} onClick={() => setRunningGoal(g.value)} className={pillClass(runningGoal === g.value)}>
+                {g.label}
+              </button>
+            ))}
+          </div>
+          {runningGoal && runningGoal !== 'fitter' && (
+            <p className="text-[11px] text-muted-foreground mt-2">
+              Your running plan is built after your 30-minute test. Until then you get the standard conditioning sessions.
+            </p>
+          )}
         </div>
 
         {/* Goal */}

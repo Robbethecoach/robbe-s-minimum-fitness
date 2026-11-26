@@ -100,6 +100,45 @@ export type Database = {
           },
         ]
       }
+      conditioning_tests: {
+        Row: {
+          avg_hr: number | null
+          created_at: string
+          distance_km: number | null
+          duration_sec: number | null
+          finish_hr: number | null
+          hr_after_1min: number | null
+          id: string
+          test_type: string
+          tested_on: string
+          user_id: string
+        }
+        Insert: {
+          avg_hr?: number | null
+          created_at?: string
+          distance_km?: number | null
+          duration_sec?: number | null
+          finish_hr?: number | null
+          hr_after_1min?: number | null
+          id?: string
+          test_type: string
+          tested_on?: string
+          user_id: string
+        }
+        Update: {
+          avg_hr?: number | null
+          created_at?: string
+          distance_km?: number | null
+          duration_sec?: number | null
+          finish_hr?: number | null
+          hr_after_1min?: number | null
+          id?: string
+          test_type?: string
+          tested_on?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       content_library: {
         Row: {
           body: string
