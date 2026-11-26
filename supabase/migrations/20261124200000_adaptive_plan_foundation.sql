@@ -55,11 +55,12 @@ CREATE POLICY "Admin can upload think images" ON storage.objects FOR INSERT TO a
   WITH CHECK (bucket_id = 'think-images' AND public.has_role(auth.uid(), 'admin'));
 
 -- ── 2. Profile: focus + 3–6 training days ──────────────────────────────
--- Focus levels: 1 = low, 2 = medium, 3 = high.
+-- Focus scores 1-5, relative to each other; the number of days makes them absolute.
 ALTER TABLE public.user_profiles
-  ADD COLUMN focus_strength SMALLINT NOT NULL DEFAULT 2 CHECK (focus_strength BETWEEN 1 AND 3),
-  ADD COLUMN focus_conditioning SMALLINT NOT NULL DEFAULT 2 CHECK (focus_conditioning BETWEEN 1 AND 3),
-  ADD COLUMN focus_mobility SMALLINT NOT NULL DEFAULT 2 CHECK (focus_mobility BETWEEN 1 AND 3),
+  ADD COLUMN focus_strength SMALLINT NOT NULL DEFAULT 3 CHECK (focus_strength BETWEEN 1 AND 5),
+  ADD COLUMN focus_conditioning SMALLINT NOT NULL DEFAULT 3 CHECK (focus_conditioning BETWEEN 1 AND 5),
+  ADD COLUMN focus_mobility SMALLINT NOT NULL DEFAULT 3 CHECK (focus_mobility BETWEEN 1 AND 5),
+  ADD COLUMN conditioning_goal TEXT CHECK (conditioning_goal IN ('5k', '10k', 'half_marathon', 'marathon', 'fitter')),
   ADD COLUMN goal TEXT;
 
 -- Existing rows may predate the rule, so validate only new / updated rows.
@@ -70,7 +71,12 @@ ALTER TABLE public.user_profiles
 -- Which quality an exercise mainly trains, so focus can scale it.
 ALTER TABLE public.exercises
   ADD COLUMN focus TEXT NOT NULL DEFAULT 'strength'
-  CHECK (focus IN ('strength', 'conditioning', 'mobility'));
+  CHECK (focus IN ('strength', 'conditioning', 'mobility')),
+  -- Main lifts get an estimated 5RM/1RM and a load range.
+  ADD COLUMN pattern TEXT CHECK (pattern IN ('squat', 'hinge', 'push', 'pull', 'single_leg', 'carry_trunk', 'accessory')),
+  ADD COLUMN is_main_lift BOOLEAN NOT NULL DEFAULT false,
+  -- Mobility exercises Robbe marks as usable in the mobility block of A/B.
+  ADD COLUMN usable_in_strength_block BOOLEAN NOT NULL DEFAULT false;
 
 -- ── 3. Member plan (season → block → deload timing) ────────────────────
 CREATE TABLE public.member_plans (
@@ -114,31 +120,40 @@ CREATE POLICY "Users view own overrides" ON public.member_exercise_overrides FOR
 CREATE POLICY "Admin manages overrides" ON public.member_exercise_overrides FOR ALL
   USING (public.has_role(auth.uid(), 'admin')) WITH CHECK (public.has_role(auth.uid(), 'admin'));
 
--- ── 4. Session rating + logged weights ─────────────────────────────────
-ALTER TABLE public.user_workout_completions
-  ADD COLUMN rating TEXT CHECK (rating IN ('too_easy', 'right', 'too_hard'));
-
+-- ── 4. Logged sets: weight, reps and RIR per set ──────────────────────
 CREATE POLICY "Users can update own completions" ON public.user_workout_completions
   FOR UPDATE USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
-CREATE TABLE public.exercise_logs (
+CREATE TABLE public.exercise_sets (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   completion_id UUID NOT NULL REFERENCES public.user_workout_completions(id) ON DELETE CASCADE,
   exercise_id UUID NOT NULL REFERENCES public.exercises(id) ON DELETE CASCADE,
-  weight_kg NUMERIC(6,2) NOT NULL CHECK (weight_kg >= 0 AND weight_kg <= 1000),
+  set_number SMALLINT NOT NULL CHECK (set_number BETWEEN 1 AND 10),
+  weight_kg NUMERIC(6,2) CHECK (weight_kg >= 0 AND weight_kg <= 1000),
+  reps SMALLINT CHECK (reps BETWEEN 0 AND 100),
+  rir SMALLINT CHECK (rir BETWEEN 0 AND 10),
+  is_calibration BOOLEAN NOT NULL DEFAULT false, -- the once-per-block set to failure
   logged_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
-  UNIQUE (completion_id, exercise_id)
+  UNIQUE (completion_id, exercise_id, set_number)
 );
 
-CREATE INDEX exercise_logs_user_exercise ON public.exercise_logs (user_id, exercise_id, logged_at DESC);
+CREATE INDEX exercise_sets_user_exercise ON public.exercise_sets (user_id, exercise_id, logged_at DESC);
 
-ALTER TABLE public.exercise_logs ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Users view own logs" ON public.exercise_logs FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users insert own logs" ON public.exercise_logs FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Users update own logs" ON public.exercise_logs FOR UPDATE USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Users delete own logs" ON public.exercise_logs FOR DELETE USING (auth.uid() = user_id);
-CREATE POLICY "Admin views all logs" ON public.exercise_logs FOR SELECT USING (public.has_role(auth.uid(), 'admin'));
+ALTER TABLE public.exercise_sets ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users view own sets" ON public.exercise_sets FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users insert own sets" ON public.exercise_sets FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users update own sets" ON public.exercise_sets FOR UPDATE USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users delete own sets" ON public.exercise_sets FOR DELETE USING (auth.uid() = user_id);
+CREATE POLICY "Admin views all sets" ON public.exercise_sets FOR SELECT USING (public.has_role(auth.uid(), 'admin'));
+
+-- Weekly check-in fields from the 26 Nov model (weight and waist optional).
+ALTER TABLE public.weekly_checkins
+  ADD COLUMN stress_level INTEGER CHECK (stress_level BETWEEN 1 AND 10),
+  ADD COLUMN pain BOOLEAN NOT NULL DEFAULT false,
+  ADD COLUMN pain_detail TEXT,
+  ADD COLUMN weight_kg NUMERIC(5,1) CHECK (weight_kg BETWEEN 20 AND 400),
+  ADD COLUMN waist_cm NUMERIC(5,1) CHECK (waist_cm BETWEEN 30 AND 250);
 
 -- ── 5. Method rules (Robbe's decision rules) ───────────────────────────
 CREATE TABLE public.method_rules (
@@ -213,7 +228,7 @@ CREATE TABLE public.escalation_flags (
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   source TEXT NOT NULL CHECK (source IN ('onboarding', 'checkin', 'session', 'engine')),
   category TEXT NOT NULL CHECK (category IN (
-    'pain', 'injury', 'under_eating', 'cycle', 'pregnancy', 'medical', 'other'
+    'pain', 'injury', 'under_eating', 'food_relationship', 'cycle', 'pregnancy', 'medical', 'other'
   )),
   detail TEXT,
   refer_to TEXT CHECK (refer_to IN ('gp', 'physio', 'dietitian', 'other')),
