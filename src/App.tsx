@@ -7,6 +7,7 @@ import Navbar from "@/components/Navbar";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import AdminRoute from "@/components/AdminRoute";
 import Index from "./pages/Index";
+import ResetPassword from "./pages/ResetPassword";
 import Auth from "./pages/Auth";
 import WeeklyOverview from "./pages/WeeklyOverview";
 import ContentLibrary from "./pages/ContentLibrary";
@@ -36,6 +37,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
             <Route path="/fuel" element={<Fuel />} />
             <Route path="/fuel/how-i-eat" element={<HowIEat />} />
