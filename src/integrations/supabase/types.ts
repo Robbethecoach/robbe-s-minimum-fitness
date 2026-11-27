@@ -14,6 +14,96 @@ export type Database = {
   }
   public: {
     Tables: {
+      invites: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string | null
+          email: string | null
+          expires_at: string
+          free_days: number
+          id: string
+          max_uses: number
+          note: string | null
+          revoked: boolean
+          sent_at: string | null
+          uses: number
+        }
+        Insert: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          expires_at?: string
+          free_days?: number
+          id?: string
+          max_uses?: number
+          note?: string | null
+          revoked?: boolean
+          sent_at?: string | null
+          uses?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          expires_at?: string
+          free_days?: number
+          id?: string
+          max_uses?: number
+          note?: string | null
+          revoked?: boolean
+          sent_at?: string | null
+          uses?: number
+        }
+        Relationships: []
+      }
+      memberships: {
+        Row: {
+          cancel_at_period_end: boolean
+          created_at: string
+          current_period_end: string | null
+          invite_id: string | null
+          reminded_1_at: string | null
+          reminded_7_at: string | null
+          status: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          trial_ends_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          invite_id?: string | null
+          reminded_1_at?: string | null
+          reminded_7_at?: string | null
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          trial_ends_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          invite_id?: string | null
+          reminded_1_at?: string | null
+          reminded_7_at?: string | null
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          trial_ends_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       app_visits: {
         Row: {
           created_at: string
@@ -1068,6 +1158,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      has_access: {
+        Args: { _user_id: string }
+        Returns: boolean
+      }
       decide_suggestion: {
         Args: { _decision: string; _suggestion_id: string }
         Returns: undefined

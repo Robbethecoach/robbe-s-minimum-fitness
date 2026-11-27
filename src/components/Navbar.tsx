@@ -58,9 +58,12 @@ const Navbar = () => {
         {/* Account — desktop */}
         <div className="hidden items-center justify-end md:flex">
           {user ? (
-            <button onClick={signOut} className={`${item} text-muted-foreground hover:text-foreground`}>
-              Sign out
-            </button>
+            <div className="flex items-center gap-6">
+              <Link to="/membership" className={desktopLink('/membership')}>Membership</Link>
+              <button onClick={signOut} className={`${item} text-muted-foreground hover:text-foreground`}>
+                Sign out
+              </button>
+            </div>
           ) : onAuthPage ? null : (
             <Link to="/auth" className={`${item} rounded-lg border border-foreground/60 px-4 py-2.5 text-foreground hover:bg-foreground hover:text-background`}>
               Sign in
@@ -101,6 +104,9 @@ const Navbar = () => {
                 {isActive(l.to) && <span className="h-1.5 w-1.5 rounded-full bg-accent" />}
               </Link>
             ))}
+            <Link to="/membership" className={`${item} border-b border-border py-4 ${isActive('/membership') ? 'text-foreground' : 'text-muted-foreground'}`}>
+              Membership
+            </Link>
             <button onClick={signOut} className={`${item} py-4 text-left text-muted-foreground`}>
               Sign out
             </button>
