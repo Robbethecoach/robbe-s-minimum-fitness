@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Check, ChevronDown, Play, Timer } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import EmomTimer from './EmomTimer';
+import { useTiming } from '@/hooks/useMethodSettings';
 import type { ActiveBlock } from '@/hooks/useActiveBlock';
 import { toPlacement } from '@/lib/feed';
 import { composeSession, placementsForSession, type Placement, type SessionItem } from '@/lib/session';
@@ -34,6 +35,7 @@ const SessionDetail = ({ block, code, title, day, date, completed, onBack, userI
   const [inputs, setInputs] = useState<Record<string, SetInput[]>>({});
   const [formError, setFormError] = useState('');
   const [showRir, setShowRir] = useState(false);
+  const { data: timing } = useTiming();
 
   const byCode = useMemo(() => {
     const map: Record<string, Placement[]> = {};
@@ -49,8 +51,9 @@ const SessionDetail = ({ block, code, title, day, date, completed, onBack, userI
       sessionMinutes: limit,
       includeAllExtras: includeAll ?? false,
       powerIncluded: block.power_included,
+      timing,
     }),
-    [code, byCode, profile, weekNumber, deloadWeek, limit, includeAll, block.power_included],
+    [code, byCode, profile, weekNumber, deloadWeek, limit, includeAll, block.power_included, timing],
   );
   const askLonger = composed.overLimit && includeAll === null && (profile.ask_when_longer ?? true);
 
@@ -185,6 +188,7 @@ const SessionDetail = ({ block, code, title, day, date, completed, onBack, userI
               item={item}
               row={rowFor(item.placement.id)}
               names={block.names}
+              firstWeek={weekNumber === 1}
               range={rangeFor(item)}
               sets={completed ? null : setsFor(item)}
               onSetChange={(n, patch) => updateSet(item, n, patch)}
@@ -217,10 +221,11 @@ const SessionDetail = ({ block, code, title, day, date, completed, onBack, userI
 const RIR_OPTIONS = ['0', '1', '2', '3', '4', '5'];
 const unitText = (unit: string, reps: string) => (unit === 'seconds' ? `${reps} s` : unit === 'per_side' ? `${reps}/side` : reps);
 
-const ItemCard = ({ item, row, names, range, sets, onSetChange }: {
+const ItemCard = ({ item, row, names, firstWeek, range, sets, onSetChange }: {
   item: SessionItem;
   row: ActiveBlock['rows'][number];
   names: Record<string, string>;
+  firstWeek: boolean;
   range: { low: number; high: number } | null;
   sets: SetInput[] | null;
   onSetChange: (n: number, patch: Partial<SetInput>) => void;
@@ -231,6 +236,7 @@ const ItemCard = ({ item, row, names, range, sets, onSetChange }: {
   const lib = row.library;
   const vid = youtubeId(lib?.video_url);
   const easier = lib?.regression_id ? names[lib.regression_id] : null;
+  const harder = lib?.progression_id ? names[lib.progression_id] : null;
   const strength = p.quality === 'strength';
   const power = p.quality === 'power';
 
@@ -245,7 +251,13 @@ const ItemCard = ({ item, row, names, range, sets, onSetChange }: {
             {item.optional ? ' · optional' : ''}
           </p>
           {lib?.cues?.length ? <p className="mt-1 text-[12px] italic text-muted-foreground/80">{lib.cues.join(' · ')}</p> : null}
-          {easier && <p className="mt-1 text-[12px] text-muted-foreground">Too hard? {easier}</p>}
+          {/* Easier / harder is for finding the right exercise in week 1; after that, progress with weight or reps. */}
+          {firstWeek && (easier || harder) && (
+            <p className="mt-1 text-[12px] text-muted-foreground">
+              Week 1: {easier && <>too hard? {easier}</>}{easier && harder && ' · '}{harder && <>too easy? {harder}</>}
+            </p>
+          )}
+          {!firstWeek && strength && <p className="mt-1 text-[12px] text-muted-foreground">A little heavier or one more rep than last week.</p>}
         </div>
         <div className="flex gap-2">
           {vid && (

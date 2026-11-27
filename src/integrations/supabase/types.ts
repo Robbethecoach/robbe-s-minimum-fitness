@@ -499,6 +499,8 @@ export type Database = {
       }
       member_plans: {
         Row: {
+          training_block_id: string | null
+          block_weeks: number
           block_number: number
           block_start_date: string
           created_at: string
@@ -510,6 +512,8 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          training_block_id?: string | null
+          block_weeks?: number
           block_number?: number
           block_start_date?: string
           created_at?: string
@@ -521,6 +525,8 @@ export type Database = {
           user_id: string
         }
         Update: {
+          training_block_id?: string | null
+          block_weeks?: number
           block_number?: number
           block_start_date?: string
           created_at?: string
@@ -569,6 +575,24 @@ export type Database = {
           priority?: number
           step?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      method_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: Json
         }
         Relationships: []
       }

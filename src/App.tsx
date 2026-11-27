@@ -20,6 +20,7 @@ import Think from "./pages/Think";
 import NotFound from "./pages/NotFound";
 import FeedLibrary from "./pages/feed/FeedLibrary";
 import FeedBlocks from "./pages/feed/FeedBlocks";
+import FeedSettings from "./pages/feed/FeedSettings";
 import BlockOverview from "./pages/BlockOverview";
 import { Navigate } from "react-router-dom";
 
@@ -48,6 +49,7 @@ const App = () => (
             <Route path="/feed" element={<Navigate to="/feed/library" replace />} />
             <Route path="/feed/library" element={<AdminRoute><FeedLibrary /></AdminRoute>} />
             <Route path="/feed/blocks" element={<AdminRoute><FeedBlocks /></AdminRoute>} />
+            <Route path="/feed/settings" element={<AdminRoute><FeedSettings /></AdminRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

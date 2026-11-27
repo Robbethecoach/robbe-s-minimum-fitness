@@ -10,6 +10,7 @@ import MovementLibrary from '@/components/move/MovementLibrary';
 import ConditioningTest from '@/components/move/ConditioningTest';
 import SessionDetail from '@/components/move/SessionDetail';
 import { useActiveBlock } from '@/hooks/useActiveBlock';
+import { weekOfPlan } from '@/lib/blocks';
 import { type ExerciseOverride, type FocusProfile, prescribe, weekInBlock } from '@/lib/prescription';
 import { SESSION_NAMES, type SessionCode, planWeek } from '@/lib/allocation';
 import { type LoggedSet, current1RM, loadIncrement, loadRange, weekTarget } from '@/lib/strength';
@@ -106,9 +107,14 @@ const Move = () => {
 
   // A published block sets the calendar for everyone (Robbe uploads every 4 weeks).
   const { data: activeBlock } = useActiveBlock();
-  const blockStart = activeBlock?.starts_on ?? plan?.block_start_date ?? profile?.training_start_date;
-  const deloadWeek = plan?.deload_week ?? 4;
-  const currentWeek = useMemo(() => (blockStart ? weekInBlock(new Date(blockStart), new Date()) : 1), [blockStart]);
+  const blockStart = activeBlock?.startDate ?? plan?.block_start_date ?? profile?.training_start_date;
+  const blockWeeks = activeBlock?.weeks ?? 4;
+  const deloadWeek = activeBlock?.deloadWeek ?? plan?.deload_week ?? 4;
+  const currentWeek = useMemo(() => {
+    if (!blockStart) return 1;
+    if (activeBlock) return weekOfPlan(new Date(blockStart), new Date(), blockWeeks) ?? blockWeeks;
+    return weekInBlock(new Date(blockStart), new Date());
+  }, [blockStart, blockWeeks, activeBlock]);
   const target = weekTarget(currentWeek, deloadWeek);
   const hasRunTest = !!lastRunTest?.some((t) => t.test_type === 'run_30');
 
@@ -230,8 +236,8 @@ const Move = () => {
           </Link>
         )}
 
-        <section className="mb-10 grid grid-cols-4 gap-2">
-          {[1, 2, 3, 4].map((w) => {
+        <section className="mb-10 grid gap-2" style={{ gridTemplateColumns: `repeat(${Math.min(blockWeeks, 4)}, minmax(0, 1fr))` }}>
+          {Array.from({ length: blockWeeks }, (_, i) => i + 1).map((w) => {
             const t = weekTarget(w, deloadWeek);
             const now = w === currentWeek;
             return (

@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom';
 const LINKS = [
   { to: '/feed/library', label: 'Exercise library' },
   { to: '/feed/blocks', label: 'Blocks' },
+  { to: '/feed/settings', label: 'Settings' },
 ];
 
 /** Robbe's Feed: desktop first, sidebar that stacks on a phone. */

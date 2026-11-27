@@ -101,6 +101,8 @@ export const weekTarget = (weekInBlock: number, deloadWeek = 4): WeekTarget => {
   if (weekInBlock === deloadWeek) return { rirMain: 4, rirAccessory: 3, label: 'Deload · RIR 4', extraSets: 0, isDeload: true };
   if (weekInBlock <= 1) return { rirMain: 3, rirAccessory: 2, label: 'RIR 3', extraSets: 0, isDeload: false };
   if (weekInBlock === 2) return { rirMain: 2, rirAccessory: 1, label: 'RIR 2', extraSets: 0, isDeload: false };
+  // Longer blocks (members who joined mid-block): after week 3, alternate RIR 2 and RIR 1–2.
+  if (weekInBlock >= 4 && weekInBlock % 2 === 0) return { rirMain: 2, rirAccessory: 1, label: 'RIR 2', extraSets: 0, isDeload: false };
   return { rirMain: 1, rirAccessory: 0, label: 'RIR 1–2', extraSets: 1, isDeload: false };
 };
 

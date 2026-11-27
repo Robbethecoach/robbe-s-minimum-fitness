@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import FeedLayout from './FeedLayout';
+import { useTiming } from '@/hooks/useMethodSettings';
 import { PREVIEW_PROFILES, type LibraryRow, type PlacementRow, formatEmom, formatSetsReps, parseEmom, parseSetsReps, toPlacement } from '@/lib/feed';
 import { composeSession, placementsForSession, type Placement } from '@/lib/session';
 import { SESSION_NAMES, STRENGTH_SESSIONS, planWeek } from '@/lib/allocation';
@@ -35,6 +36,7 @@ const BALANCED = { focus_strength: 3, focus_mobility: 3, focus_conditioning: 3 }
 const FeedBlocks = () => {
   const queryClient = useQueryClient();
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const { data: timing } = useTiming();
 
   const { data: blocks = [] } = useQuery({
     queryKey: ['training_blocks_admin'],
@@ -239,7 +241,7 @@ const FeedBlocks = () => {
             <div className="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(250px,1fr))] items-start">
               {SESSIONS.map((s) => {
                 const sessionId = sessionIdFor(s.code);
-                const composed = composeSession(byCode[s.code] ?? [], BALANCED, { weekInBlock: 1, deloadWeek: 4, sessionMinutes: 60, includeAllExtras: true, powerIncluded: block.power_included });
+                const composed = composeSession(byCode[s.code] ?? [], BALANCED, { weekInBlock: 1, deloadWeek: 4, sessionMinutes: 60, includeAllExtras: true, powerIncluded: block.power_included, timing });
                 const raw = rowsFor(s.code);
                 return (
                   <section key={s.code} className="space-y-2 rounded-2xl border border-border bg-card p-4">
@@ -325,7 +327,7 @@ const FeedBlocks = () => {
                   ).filter((d) => d.session);
                   const strengthDay = week.find((d) => d.session && STRENGTH_SESSIONS.includes(d.session));
                   const sample = strengthDay?.session
-                    ? composeSession(placementsForSession(strengthDay.session, byCode), profile, { weekInBlock: 1, deloadWeek: 4, sessionMinutes: 60, powerIncluded: block.power_included })
+                    ? composeSession(placementsForSession(strengthDay.session, byCode), profile, { weekInBlock: 1, deloadWeek: 4, sessionMinutes: 60, powerIncluded: block.power_included, timing })
                     : null;
                   const firstMain = sample?.items.find((i) => i.placement.role === 'main');
                   return (

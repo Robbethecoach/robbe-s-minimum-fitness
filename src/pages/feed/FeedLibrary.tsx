@@ -249,6 +249,7 @@ const FeedLibrary = () => {
           </div>
 
           <div className="grid sm:grid-cols-2 gap-4">
+            <p className="sm:col-span-2 -mb-2 text-[12px] text-muted-foreground">Only shown in week 1, to find the right version. After that members progress with weight or reps.</p>
             <label className="text-[13px] font-medium space-y-1.5 block">Easier (regression)
               <select value={draft.regression_id} onChange={(e) => update({ regression_id: e.target.value })} className={inputClass}>
                 <option value="">—</option>
@@ -296,9 +297,9 @@ const FeedLibrary = () => {
               {draft.cues.filter(Boolean).map((c, i) => <p key={i} className="text-[13px] text-muted-foreground">· {c}</p>)}
               {(draft.regression_id || draft.progression_id) && (
                 <p className="text-[12px] text-muted-foreground pt-1">
-                  {draft.regression_id && <>Too hard? {library.find((x) => x.id === draft.regression_id)?.name}</>}
+                  Week 1: {draft.regression_id && <>too hard? {library.find((x) => x.id === draft.regression_id)?.name}</>}
                   {draft.regression_id && draft.progression_id && ' · '}
-                  {draft.progression_id && <>Ready for more? {library.find((x) => x.id === draft.progression_id)?.name}</>}
+                  {draft.progression_id && <>too easy? {library.find((x) => x.id === draft.progression_id)?.name}</>}
                 </p>
               )}
             </div>

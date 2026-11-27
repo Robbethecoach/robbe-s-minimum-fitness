@@ -99,6 +99,10 @@ const BlockOverview = () => {
         <p className="mt-3 text-[15px] leading-relaxed text-muted-foreground">
           These are the strength, power and mobility exercises you'll do this block. Get familiar with them before you enter the gym.
         </p>
+        <p className="mt-3 rounded-xl border border-border px-4 py-3 text-[13px] leading-relaxed text-muted-foreground">
+          <b className="text-foreground">How you progress:</b> in week 1 you find the right version of each exercise (easier or harder if needed).
+          From week 2 you keep the exercise and make it a little harder every week: a bit more weight or one more rep.
+        </p>
 
         {isLoading && <p className="mt-8 text-sm text-muted-foreground">Loading…</p>}
         {!isLoading && !block && <p className="mt-8 text-sm text-muted-foreground">Your first block isn't published yet. You'll find it here as soon as it is.</p>}
@@ -169,9 +173,10 @@ const OverviewCard = ({ row, p, codes, names, watched, onToggle }: { row: Row; p
         )}
         <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border pt-2 text-[13px]">
           <span className="text-muted-foreground">
-            {easier && <>Too hard? <b className="text-foreground">{easier}</b></>}
+            {(easier || harder) && 'Week 1: '}
+            {easier && <>too hard? <b className="text-foreground">{easier}</b></>}
             {easier && harder && ' · '}
-            {harder && <>Ready for more? <b className="text-foreground">{harder}</b></>}
+            {harder && <>too easy? <b className="text-foreground">{harder}</b></>}
           </span>
           <button onClick={() => onToggle(!watched)} className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] font-medium ${watched ? 'bg-accent text-accent-foreground' : 'border border-border'}`}>
             {watched && <Check className="h-3.5 w-3.5" strokeWidth={2} />} {watched ? 'Watched' : 'Mark as watched'}

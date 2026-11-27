@@ -59,16 +59,35 @@ export interface ComposedSession {
   overLimit: boolean;
 }
 
-/** PLACEHOLDER (Robbe to tune): rest between sets, seconds. */
-export const REST_SECONDS: Record<Quality, Record<Role, number>> = {
-  strength: { main: 150, accessory: 75, extra: 60 },
-  power: { main: 120, accessory: 90, extra: 90 },
-  mobility: { main: 30, accessory: 20, extra: 20 },
+/** Timing used for the duration estimate. Robbe tunes these in the Feed (method_settings 'timing'). */
+export interface Timing {
+  /** Rest between sets, seconds. */
+  rest: Record<Quality, Record<Role, number>>;
+  secondsPerRep: number;
+  warmUpMinutes: number;
+}
+
+export const DEFAULT_TIMING: Timing = {
+  rest: {
+    strength: { main: 150, accessory: 75, extra: 60 },
+    power: { main: 120, accessory: 90, extra: 90 },
+    mobility: { main: 30, accessory: 20, extra: 20 },
+  },
+  secondsPerRep: 4,
+  warmUpMinutes: 8,
 };
 
-/** PLACEHOLDER: seconds of work per rep, and warm-up time added to every session. */
-export const SECONDS_PER_REP = 4;
-export const WARM_UP_MINUTES = 8;
+/** Merge saved settings over the defaults, ignoring anything malformed. */
+export const timingFrom = (value: unknown): Timing => {
+  const v = (value ?? {}) as Partial<Timing>;
+  const num = (x: unknown, d: number) => (typeof x === 'number' && x >= 0 && x < 3600 ? x : d);
+  const rest = {} as Timing['rest'];
+  for (const q of ['strength', 'power', 'mobility'] as Quality[]) {
+    rest[q] = {} as Record<Role, number>;
+    for (const r of ['main', 'accessory', 'extra'] as Role[]) rest[q][r] = num(v.rest?.[q]?.[r], DEFAULT_TIMING.rest[q][r]);
+  }
+  return { rest, secondsPerRep: num(v.secondsPerRep, DEFAULT_TIMING.secondsPerRep), warmUpMinutes: num(v.warmUpMinutes, DEFAULT_TIMING.warmUpMinutes) };
+};
 
 const ROLE_ORDER: Record<Role, number> = { main: 0, accessory: 1, extra: 2 };
 
@@ -93,16 +112,16 @@ const repsNumber = (reps: string): number => {
   return nums.length >= 2 ? (nums[0] + nums[1]) / 2 : nums[0];
 };
 
-const workSeconds = (p: Placement, reps: string) => {
+const workSeconds = (p: Placement, reps: string, t: Timing = DEFAULT_TIMING) => {
   const n = repsNumber(reps);
   if (p.unit === 'seconds') return n;
-  if (p.unit === 'per_side') return n * SECONDS_PER_REP * 2;
-  return n * SECONDS_PER_REP;
+  if (p.unit === 'per_side') return n * t.secondsPerRep * 2;
+  return n * t.secondsPerRep;
 };
 
-export const estimateSeconds = (p: Placement, rx: Prescription): number => {
+export const estimateSeconds = (p: Placement, rx: Prescription, t: Timing = DEFAULT_TIMING): number => {
   if (p.emom_interval_sec) return rx.sets * p.emom_interval_sec;
-  return rx.sets * (workSeconds(p, rx.reps) + REST_SECONDS[p.quality][p.role]);
+  return rx.sets * (workSeconds(p, rx.reps, t) + t.rest[p.quality][p.role]);
 };
 
 const opposite = (a: Region, b: Region) =>
@@ -142,8 +161,10 @@ export const composeSession = (
     includeAllExtras?: boolean;
     /** Power can be switched off per block, and is dropped in the deload week. */
     powerIncluded?: boolean;
+    timing?: Timing;
   },
 ): ComposedSession => {
+  const t = opts.timing ?? DEFAULT_TIMING;
   const limit = opts.sessionMinutes ?? 60;
   const deload = opts.weekInBlock === opts.deloadWeek;
   const powerOn = (opts.powerIncluded ?? true) && !deload;
@@ -166,7 +187,7 @@ export const composeSession = (
 
   const minutesFor = (list: Placement[]) => {
     const pairs = pairSupersets(list);
-    let seconds = WARM_UP_MINUTES * 60;
+    let seconds = t.warmUpMinutes * 60;
     const counted = new Set<string>();
     for (const p of list) {
       if (counted.has(p.id)) continue;
@@ -177,10 +198,10 @@ export const composeSession = (
         const a = rx.get(p.id)!;
         const b = rx.get(partner.id)!;
         const sets = Math.max(a.sets, b.sets);
-        seconds += sets * (workSeconds(p, a.reps) + workSeconds(partner, b.reps) + Math.max(REST_SECONDS[p.quality][p.role], REST_SECONDS[partner.quality][partner.role]));
+        seconds += sets * (workSeconds(p, a.reps, t) + workSeconds(partner, b.reps, t) + Math.max(t.rest[p.quality][p.role], t.rest[partner.quality][partner.role]));
         counted.add(partner.id);
       } else {
-        seconds += estimateSeconds(p, rx.get(p.id)!);
+        seconds += estimateSeconds(p, rx.get(p.id)!, t);
       }
       counted.add(p.id);
     }
@@ -215,7 +236,7 @@ export const composeSession = (
         label: partner ? `${L}${i + 1}` : L,
         group: L,
         optional: m.role === 'extra' && scoreFor(profile, m.quality) === 3,
-        estimatedSeconds: estimateSeconds(m, prescription),
+        estimatedSeconds: estimateSeconds(m, prescription, t),
       });
       done.add(m.id);
     });

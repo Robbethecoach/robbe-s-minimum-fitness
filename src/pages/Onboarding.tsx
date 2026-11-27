@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { MAX_DAYS, MIN_DAYS, SESSION_NAMES, planWeek } from '@/lib/allocation';
+import { planForNewMember } from '@/lib/blocks';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 // Level is measured from the weights logged in week 1, so there's no experience question.
@@ -109,7 +110,10 @@ const Onboarding = () => {
       .eq('status', 'active')
       .maybeSingle();
     if (!activePlan) {
-      const { error: planError } = await supabase.from('member_plans').insert({ user_id: user!.id });
+      // Joining mid-block: start with the previous block until the next one begins (src/lib/blocks.ts).
+      const { data: published } = await supabase.from('training_blocks').select('id, block_number, starts_on').eq('status', 'published');
+      const blockPlan = planForNewMember(published ?? [], new Date());
+      const { error: planError } = await supabase.from('member_plans').insert({ user_id: user!.id, ...(blockPlan ?? {}) });
       if (planError) {
         setError(planError.message);
         setLoading(false);

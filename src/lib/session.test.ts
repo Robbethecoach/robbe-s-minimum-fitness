@@ -66,6 +66,19 @@ describe('composeSession', () => {
   });
 });
 
+describe('timing', () => {
+  it('uses Robbe’s own rest times when set, and ignores malformed values', async () => {
+    const { timingFrom } = await import('./session');
+    const t = timingFrom({ rest: { strength: { main: 240 } }, warmUpMinutes: 'ten' });
+    expect(t.rest.strength.main).toBe(240);
+    expect(t.rest.strength.accessory).toBe(75);
+    expect(t.warmUpMinutes).toBe(8);
+    const slow = composeSession(sessionA, balanced, { ...week1, sessionMinutes: 120, timing: t });
+    const normal = composeSession(sessionA, balanced, { ...week1, sessionMinutes: 120 });
+    expect(slow.fullMinutes).toBeGreaterThan(normal.fullMinutes);
+  });
+});
+
 describe('pairSupersets', () => {
   it('respects a pair Robbe fixed by hand', () => {
     const pairs = pairSupersets([
