@@ -6,7 +6,6 @@ import { useAuth } from '@/contexts/AuthContext';
 const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isSignUp, setIsSignUp] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
@@ -35,18 +34,9 @@ const Auth = () => {
     setMessage('');
     setLoading(true);
 
-    if (isSignUp) {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: { emailRedirectTo: window.location.origin },
-      });
-      if (error) setError(error.message);
-      else setMessage('Check your email to confirm your account.');
-    } else {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) setError(error.message);
-    }
+    // Invite only for now: accounts are created by Robbe, so there is no sign-up here.
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) setError(error.message);
     setLoading(false);
   };
 
@@ -57,7 +47,7 @@ const Auth = () => {
     <div className="flex min-h-screen items-center justify-center px-6 pt-14">
       <div className="w-full max-w-sm">
         <h1 className="font-serif italic text-3xl md:text-4xl mb-10 text-center">
-          {isSignUp ? 'Create account' : 'Sign in'}
+          Sign in
         </h1>
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           <input
@@ -84,15 +74,12 @@ const Auth = () => {
             disabled={loading}
             className="bg-primary text-primary-foreground px-8 py-[14px] text-[13px] font-medium tracking-[0.08em] uppercase transition-colors hover:bg-foreground/90 disabled:opacity-40 rounded-lg"
           >
-            {loading ? '...' : isSignUp ? 'Sign up' : 'Sign in'}
+            {loading ? '...' : 'Sign in'}
           </button>
         </form>
-        <button
-          onClick={() => { setIsSignUp(!isSignUp); setError(''); setMessage(''); }}
-          className="mt-8 block w-full text-center text-[12px] font-medium text-muted-foreground tracking-[0.08em] uppercase hover:text-foreground transition-colors"
-        >
-          {isSignUp ? 'Already have an account? Sign in' : 'Need an account? Sign up'}
-        </button>
+        <p className="mt-8 text-center text-[13px] leading-relaxed text-muted-foreground">
+          Minimum Fitness is invite only for now.
+        </p>
       </div>
     </div>
   );
