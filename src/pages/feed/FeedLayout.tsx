@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom';
 const LINKS = [
   { to: '/feed/library', label: 'Exercise library' },
   { to: '/feed/blocks', label: 'Blocks' },
+  { to: '/feed/visits', label: 'Visits' },
   { to: '/feed/settings', label: 'Settings' },
 ];
 

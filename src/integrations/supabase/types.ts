@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_visits: {
+        Row: {
+          created_at: string
+          device: string | null
+          id: number
+          path: string
+          referrer: string | null
+          standalone: boolean
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          device?: string | null
+          id?: never
+          path: string
+          referrer?: string | null
+          standalone?: boolean
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          device?: string | null
+          id?: never
+          path?: string
+          referrer?: string | null
+          standalone?: boolean
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       accessory_library: {
         Row: {
           coaching_note: string | null
@@ -102,6 +132,11 @@ export type Database = {
       }
       conditioning_tests: {
         Row: {
+          lt1_hr: number | null
+          lt1_pace_sec: number | null
+          report_path: string | null
+          threshold_hr: number | null
+          threshold_pace_sec: number | null
           avg_hr: number | null
           created_at: string
           distance_km: number | null
@@ -114,6 +149,11 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          lt1_hr?: number | null
+          lt1_pace_sec?: number | null
+          report_path?: string | null
+          threshold_hr?: number | null
+          threshold_pace_sec?: number | null
           avg_hr?: number | null
           created_at?: string
           distance_km?: number | null
@@ -126,6 +166,11 @@ export type Database = {
           user_id: string
         }
         Update: {
+          lt1_hr?: number | null
+          lt1_pace_sec?: number | null
+          report_path?: string | null
+          threshold_hr?: number | null
+          threshold_pace_sec?: number | null
           avg_hr?: number | null
           created_at?: string
           distance_km?: number | null

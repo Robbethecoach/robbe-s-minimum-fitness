@@ -8,6 +8,8 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import AdminRoute from "@/components/AdminRoute";
 import Index from "./pages/Index";
 import ResetPassword from "./pages/ResetPassword";
+import FeedVisits from "./pages/feed/FeedVisits";
+import VisitTracker from "./components/VisitTracker";
 import Auth from "./pages/Auth";
 import WeeklyOverview from "./pages/WeeklyOverview";
 import ContentLibrary from "./pages/ContentLibrary";
@@ -34,6 +36,7 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <Navbar />
+          <VisitTracker />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
@@ -51,6 +54,7 @@ const App = () => (
             <Route path="/feed" element={<Navigate to="/feed/library" replace />} />
             <Route path="/feed/library" element={<AdminRoute><FeedLibrary /></AdminRoute>} />
             <Route path="/feed/blocks" element={<AdminRoute><FeedBlocks /></AdminRoute>} />
+            <Route path="/feed/visits" element={<AdminRoute><FeedVisits /></AdminRoute>} />
             <Route path="/feed/settings" element={<AdminRoute><FeedSettings /></AdminRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>

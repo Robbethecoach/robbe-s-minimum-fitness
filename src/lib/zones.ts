@@ -76,3 +76,58 @@ export const paceRange = (thresholdSpeedKmh: number, zone: Zone['zone']) => {
 
 /** Retest every 8 weeks (decided 26 Nov). */
 export const RETEST_WEEKS = 8;
+
+/**
+ * 5 km best with average heart rate (a race or a hard solo effort, in the last ~8 weeks).
+ * A 5 km is run a little above threshold, so both numbers are scaled down to threshold.
+ * PLACEHOLDER (to confirm with Robbe): threshold speed = 93% of 5 km speed,
+ * threshold heart rate = 97% of the 5 km average heart rate.
+ */
+export const FIVE_K_SPEED_FACTOR = 0.93;
+export const FIVE_K_HR_FACTOR = 0.97;
+
+export const fromFiveK = (timeSec: number, avgHr: number): ThresholdResult => {
+  const fiveKSpeed = 5 / (timeSec / 3600);
+  const thresholdSpeedKmh = fiveKSpeed * FIVE_K_SPEED_FACTOR;
+  return {
+    thresholdSpeedKmh,
+    thresholdPaceSec: 3600 / thresholdSpeedKmh,
+    thresholdHr: Math.round(avgHr * FIVE_K_HR_FACTOR),
+  };
+};
+
+/** Lactate test: the second threshold (LT2 / ~4 mmol) is the threshold, as measured. */
+export const fromLactate = (lt2PaceSec: number, lt2Hr: number): ThresholdResult => ({
+  thresholdSpeedKmh: 3600 / lt2PaceSec,
+  thresholdPaceSec: lt2PaceSec,
+  thresholdHr: Math.round(lt2Hr),
+});
+
+export interface TestLike {
+  test_type: string;
+  distance_km: number | null;
+  avg_hr: number | null;
+  duration_sec: number | null;
+  threshold_hr?: number | null;
+  threshold_pace_sec?: number | null;
+}
+
+/** Test types that give a running threshold (and so unlock intervals). */
+export const THRESHOLD_TESTS = ['run_30', 'lactate', 'race_5k'];
+
+/** Threshold from whichever test the member logged; null for the walk test or incomplete rows. */
+export const thresholdFromTest = (t: TestLike): ThresholdResult | null => {
+  if (t.test_type === 'run_30' && t.distance_km && t.avg_hr) return fromThirtyMinuteTest(Number(t.distance_km), t.avg_hr);
+  if (t.test_type === 'race_5k' && t.duration_sec && t.avg_hr) return fromFiveK(t.duration_sec, t.avg_hr);
+  if (t.test_type === 'lactate' && t.threshold_pace_sec && t.threshold_hr) return fromLactate(t.threshold_pace_sec, t.threshold_hr);
+  return null;
+};
+
+/** "4:35" or "4.35" or "4'35" → seconds. Also accepts "22:30" for a 5 km time. Null when unreadable. */
+export const parseMinSec = (v: string): number | null => {
+  const m = v.trim().match(/^(\d{1,2})[:.'’,](\d{1,2})$/);
+  if (!m) return null;
+  const sec = Number(m[2]);
+  if (sec >= 60) return null;
+  return Number(m[1]) * 60 + sec;
+};

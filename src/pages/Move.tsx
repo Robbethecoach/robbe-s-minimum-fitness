@@ -8,6 +8,7 @@ import { ArrowLeft, Check, ChevronDown, Play, RefreshCw } from 'lucide-react';
 import { addDays, format, startOfWeek } from 'date-fns';
 import MovementLibrary from '@/components/move/MovementLibrary';
 import ConditioningTest from '@/components/move/ConditioningTest';
+import { THRESHOLD_TESTS } from '@/lib/zones';
 import SessionDetail from '@/components/move/SessionDetail';
 import { useActiveBlock } from '@/hooks/useActiveBlock';
 import { weekOfPlan } from '@/lib/blocks';
@@ -116,7 +117,7 @@ const Move = () => {
     return weekInBlock(new Date(blockStart), new Date());
   }, [blockStart, blockWeeks, activeBlock]);
   const target = weekTarget(currentWeek, deloadWeek);
-  const hasRunTest = !!lastRunTest?.some((t) => t.test_type === 'run_30');
+  const hasRunTest = !!lastRunTest?.some((t) => THRESHOLD_TESTS.includes(t.test_type));
 
   const { data: legacyBlocks } = useQuery({
     queryKey: ['workout_blocks', currentWeek],
