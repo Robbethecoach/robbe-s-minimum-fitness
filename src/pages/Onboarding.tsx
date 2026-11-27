@@ -133,7 +133,7 @@ const Onboarding = () => {
       }
     }
 
-    navigate('/move');
+    navigate('/move/overview');
   };
 
   const pillClass = (active: boolean) =>

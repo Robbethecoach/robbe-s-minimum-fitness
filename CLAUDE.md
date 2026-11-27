@@ -13,7 +13,8 @@ Membership app for the robbethecoach brand. Product brief lives in the claude.ai
 React 18 + Vite + TypeScript, Tailwind + shadcn/ui, TanStack Query, Supabase. Package manager: bun (`bun install`, `bun run build`, `bunx vitest run`).
 
 ## Conventions
-- Plan logic lives in `src/lib/` (allocation, prescription, strength, zones, nutrition), pure and tested. Numbers marked PLACEHOLDER are Robbe's to set.
+- Plan logic lives in `src/lib/` (allocation, prescription, strength, zones, nutrition, session, feed), pure and tested. Numbers marked PLACEHOLDER are Robbe's to set.
+- Robbe's Feed (`/feed`, admin only): exercise library (`exercise_library`: role main/accessory/extra, quality strength/mobility/power, region, pattern, unit, cues, regression/progression, superset ok, EMOM) and 4-week blocks (`training_blocks` → sessions in `workout_blocks` → placements in `exercises.library_id`). `src/lib/session.ts` orders sessions, pairs supersets, drops extras by focus or the member's session length (default 60 min, member is asked) and estimates duration.
 - Schema changes: new file in `supabase/migrations/`, RLS on every table, admin checks through `public.has_role(auth.uid(), 'admin')`.
 - Members change suggestion status only through `public.decide_suggestion()`.
 - Supabase project: `tmthanzdkvqutkajsyji` (rtc-minimum-fitness, Robbe's own org). After a schema change, regenerate `src/integrations/supabase/types.ts`.

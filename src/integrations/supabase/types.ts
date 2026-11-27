@@ -238,6 +238,66 @@ export type Database = {
         }
         Relationships: []
       }
+      exercise_library: {
+        Row: {
+          created_at: string
+          cues: string[]
+          default_reps: string
+          default_sets: number
+          emom_interval_sec: number | null
+          id: string
+          name: string
+          pattern: string | null
+          progression_id: string | null
+          quality: string
+          region: string
+          regression_id: string | null
+          role: string
+          superset_ok: boolean
+          unit: string
+          updated_at: string
+          video_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          cues?: string[]
+          default_reps?: string
+          default_sets?: number
+          emom_interval_sec?: number | null
+          id?: string
+          name: string
+          pattern?: string | null
+          progression_id?: string | null
+          quality?: string
+          region?: string
+          regression_id?: string | null
+          role?: string
+          superset_ok?: boolean
+          unit?: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          cues?: string[]
+          default_reps?: string
+          default_sets?: number
+          emom_interval_sec?: number | null
+          id?: string
+          name?: string
+          pattern?: string | null
+          progression_id?: string | null
+          quality?: string
+          region?: string
+          regression_id?: string | null
+          role?: string
+          superset_ok?: boolean
+          unit?: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Relationships: []
+      }
       exercise_sets: {
         Row: {
           completion_id: string
@@ -292,8 +352,33 @@ export type Database = {
           },
         ]
       }
+      exercise_views: {
+        Row: {
+          id: string
+          library_id: string
+          user_id: string
+          watched_at: string
+        }
+        Insert: {
+          id?: string
+          library_id: string
+          user_id: string
+          watched_at?: string
+        }
+        Update: {
+          id?: string
+          library_id?: string
+          user_id?: string
+          watched_at?: string
+        }
+        Relationships: []
+      }
       exercises: {
         Row: {
+          library_id: string | null
+          role: string | null
+          emom_interval_sec: number | null
+          superset_with: string | null
           alternative_coaching_note: string | null
           alternative_name: string | null
           alternative_youtube_url: string | null
@@ -313,6 +398,10 @@ export type Database = {
           youtube_url: string | null
         }
         Insert: {
+          library_id?: string | null
+          role?: string | null
+          emom_interval_sec?: number | null
+          superset_with?: string | null
           alternative_coaching_note?: string | null
           alternative_name?: string | null
           alternative_youtube_url?: string | null
@@ -332,6 +421,10 @@ export type Database = {
           youtube_url?: string | null
         }
         Update: {
+          library_id?: string | null
+          role?: string | null
+          emom_interval_sec?: number | null
+          superset_with?: string | null
           alternative_coaching_note?: string | null
           alternative_name?: string | null
           alternative_youtube_url?: string | null
@@ -680,8 +773,43 @@ export type Database = {
           },
         ]
       }
+      training_blocks: {
+        Row: {
+          block_number: number
+          created_at: string
+          id: string
+          power_included: boolean
+          starts_on: string
+          status: string
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          block_number: number
+          created_at?: string
+          id?: string
+          power_included?: boolean
+          starts_on: string
+          status?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          block_number?: number
+          created_at?: string
+          id?: string
+          power_included?: boolean
+          starts_on?: string
+          status?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_profiles: {
         Row: {
+          session_minutes: number
+          ask_when_longer: boolean
           conditioning_goal: string | null
           created_at: string
           equipment_access: string
@@ -698,6 +826,8 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          session_minutes?: number
+          ask_when_longer?: boolean
           conditioning_goal?: string | null
           created_at?: string
           equipment_access?: string
@@ -714,6 +844,8 @@ export type Database = {
           user_id: string
         }
         Update: {
+          session_minutes?: number
+          ask_when_longer?: boolean
           conditioning_goal?: string | null
           created_at?: string
           equipment_access?: string
@@ -837,6 +969,7 @@ export type Database = {
       }
       workout_blocks: {
         Row: {
+          training_block_id: string | null
           created_at: string
           day_type: string
           id: string
@@ -844,6 +977,7 @@ export type Database = {
           workout_name: string
         }
         Insert: {
+          training_block_id?: string | null
           created_at?: string
           day_type: string
           id?: string
@@ -851,6 +985,7 @@ export type Database = {
           workout_name: string
         }
         Update: {
+          training_block_id?: string | null
           created_at?: string
           day_type?: string
           id?: string

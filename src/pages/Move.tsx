@@ -8,6 +8,8 @@ import { ArrowLeft, Check, ChevronDown, Play, RefreshCw } from 'lucide-react';
 import { addDays, format, startOfWeek } from 'date-fns';
 import MovementLibrary from '@/components/move/MovementLibrary';
 import ConditioningTest from '@/components/move/ConditioningTest';
+import SessionDetail from '@/components/move/SessionDetail';
+import { useActiveBlock } from '@/hooks/useActiveBlock';
 import { type ExerciseOverride, type FocusProfile, prescribe, weekInBlock } from '@/lib/prescription';
 import { SESSION_NAMES, type SessionCode, planWeek } from '@/lib/allocation';
 import { type LoggedSet, current1RM, loadIncrement, loadRange, weekTarget } from '@/lib/strength';
@@ -102,21 +104,27 @@ const Move = () => {
     enabled: !!user,
   });
 
-  const blockStart = plan?.block_start_date ?? profile?.training_start_date;
+  // A published block sets the calendar for everyone (Robbe uploads every 4 weeks).
+  const { data: activeBlock } = useActiveBlock();
+  const blockStart = activeBlock?.starts_on ?? plan?.block_start_date ?? profile?.training_start_date;
   const deloadWeek = plan?.deload_week ?? 4;
   const currentWeek = useMemo(() => (blockStart ? weekInBlock(new Date(blockStart), new Date()) : 1), [blockStart]);
   const target = weekTarget(currentWeek, deloadWeek);
   const hasRunTest = !!lastRunTest?.some((t) => t.test_type === 'run_30');
 
-  const { data: workoutBlocks } = useQuery({
+  const { data: legacyBlocks } = useQuery({
     queryKey: ['workout_blocks', currentWeek],
     queryFn: async () => {
       const { data, error } = await supabase.from('workout_blocks').select('*').eq('week_number', currentWeek);
       if (error) throw error;
       return data as WorkoutBlock[];
     },
-    enabled: !!user,
+    enabled: !!user && activeBlock === null,
   });
+
+  const workoutBlocks: WorkoutBlock[] | undefined = activeBlock
+    ? activeBlock.sessions.map((s) => ({ id: s.id, week_number: currentWeek, day_type: s.day_type, workout_name: s.workout_name }))
+    : legacyBlocks;
 
   const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
 
@@ -163,6 +171,24 @@ const Move = () => {
   const isCompleted = (view: SessionView | null, date: string) =>
     !!view && !!completions?.some((c) => c.workout_block_id === view.blocks[0]?.id && c.day_date === date);
 
+  if (selected && profile && activeBlock) {
+    return (
+      <SessionDetail
+        block={activeBlock}
+        code={selected.view.code}
+        title={selected.view.title}
+        day={selected.day}
+        date={selected.date}
+        completed={isCompleted(selected.view, selected.date)}
+        onBack={() => setSelected(null)}
+        userId={user!.id}
+        weekNumber={currentWeek}
+        deloadWeek={deloadWeek}
+        profile={profile}
+      />
+    );
+  }
+
   if (selected && profile) {
     return (
       <WorkoutDetail
@@ -190,9 +216,19 @@ const Move = () => {
             <ArrowLeft className="h-3.5 w-3.5" strokeWidth={1.5} />
             Back
           </Link>
-          <p className="text-[12px] tracking-[0.12em] uppercase text-muted-foreground">Block {plan?.block_number ?? 1}</p>
+          <p className="text-[12px] tracking-[0.12em] uppercase text-muted-foreground">Block {activeBlock?.block_number ?? plan?.block_number ?? 1}</p>
           <h1 className="font-serif italic text-4xl md:text-5xl mt-1">Move</h1>
         </div>
+
+        {activeBlock && (
+          <Link to="/move/overview" className="mb-8 flex items-center justify-between rounded-xl bg-secondary px-4 py-3.5">
+            <span>
+              <span className="block text-[11px] uppercase tracking-[0.12em] text-muted-foreground">Block {activeBlock.block_number} overview</span>
+              <span className="block text-[15px]">All exercises for these 4 weeks, with video</span>
+            </span>
+            <span aria-hidden="true">→</span>
+          </Link>
+        )}
 
         <section className="mb-10 grid grid-cols-4 gap-2">
           {[1, 2, 3, 4].map((w) => {
